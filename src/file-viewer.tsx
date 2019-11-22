@@ -85,23 +85,25 @@ const Viewer: React.FC<IViewer> = ({
       // console.log("File viewer unmounted")
     }
   }, [])
-  /** Если userId = null то кнопка подписи отсутсвует */
-  const SignButton = ({ signs, fileId }) => {
-    let needToSign = false //Нужно ли currentUser-у подписывать документ
-    let signed = false // подписал ли currentUser документ
 
-    /** Если он есть в списке sings то ему нужно подписать дкумент */
-    signs.forEach(sign => {
-      if (userId && sign.userId == userId) {
-        needToSign = true
-        if (sign.signed) {
-          signed = true
-        }
+  let needToSign = false //Нужно ли currentUser-у подписывать документ
+  let signed = false // подписал ли currentUser документ
+
+  /** Если он есть в списке sings то ему нужно подписать дкумент */
+  fileContext.metadata.signs.forEach(sign => {
+    if (userId && sign.userId == userId) {
+      needToSign = true
+      if (sign.signed) {
+        signed = true
       }
-    })
+    }
+  })
+  // /** Если userId = null то кнопка подписи отсутсвует */
+  // const SignButton = ({ signs, fileId }) => {
 
-    return needToSign && !signed ? <SignFile fileId={fileId} handleSign={handleSign} /> : <div />
-  }
+
+  //   return needToSign && !signed ? <SignFile fileId={fileId} handleSign={handleSign} /> : <div />
+  // }
   const onRemove = async (e: Event, fileId: string) => {
     e.preventDefault()
     const isRemoved = await handleRemoveContext(fileId)
@@ -133,7 +135,7 @@ const Viewer: React.FC<IViewer> = ({
           {isLoading && <StdSpinner />}
         </div>
       </div>
-      <SignButton signs={fileContext.metadata.signs} fileId={file._id} />
+      {needToSign && !signed && <SignFile fileId={file._id} handleSign={handleSign} />}
     </div>
   )
 }

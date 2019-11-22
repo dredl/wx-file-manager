@@ -18,11 +18,13 @@ interface IFileUploader {
     needToSign?: boolean;
     enableFakeRemove?: boolean;
     handleFakeRemove?: any;
+    maxFileSize?: number;
 }
 /**
  * @param theme Есть 2 вида загрузчика: 1. Стандарный 2. Серая кнопка
  * @param uploadText Заголовок загрузчика
  * @param objId ID связанного объекта
+ * @param maxFileSize максимальный размер загружаемого файла
  * @param objCode Code связанного объекта
  * @param objType Тип связанного объекта (Товар Сделка Торги и тд)
  * @param handleUpload ок
@@ -37,7 +39,6 @@ interface IFileUploader {
  * @param handleFakeRemove Обработчик ложного удаления файла. Доступно только когда tool="viewer"
  * TODO: нужно сделать еще fakeRemove. Например, когда ползователь редактурет товар, при нажатии кнопки УДАЛИТЬ не должен удалять файл из сервера до тех пор пока не созранить форму
  * TODO: сделать ограничения по размеру файла, по умолчанию сделать 5MB
- * TODO: нужно сделать такую тему, что када клиенту нужно загрузить file и не нужно ее подписывать, а галочка уже была. Сейчас эта работает только с нерезидентом (реализовано на сервере)
  * TODO: нужно реализовать loading у removeMutation и signMutation
  */
 declare const FileUploader: React.FC<IFileUploader>;

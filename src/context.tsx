@@ -24,11 +24,13 @@ const FilesProvider = props => {
   useEffect(() => {
     setFile(props.file)
   }, [props.file])
-  const upload = async (e, { objId, objType, objCode, needToSign }) => {
+  const upload = async (e, { objId, objType, objCode, needToSign, maxFileSize }) => {
+
     const {
       validity,
       files: [file]
     } = e.target
+    let sizeValid = true
     let fileObj = null
     const metadata = {
       objType, //set default to 999 = not set
@@ -38,19 +40,29 @@ const FilesProvider = props => {
     }
 
     const randId = Math.floor(Math.random() * (10000 - 1)) + 1
-    /** default template until file is loading */
-    fileObj = {
-      _id: randId,
-      loading: true,
-      name: file.name,
-      size: filesize(file.size),
-      metadata: {
-        signs: [],
-        title: file.name
-      }
-    }
 
-    if (validity.valid) {
+    if (validity.valid && file.size > maxFileSize ) {
+      notifyServer({
+        type: "error",
+        Content: () => {
+          return <span>Загружаемый файл превышаеть допустимый лимит {filesize(maxFileSize)}</span>
+        },
+      })
+      e.target.value = null
+      sizeValid = false
+    }
+    if (validity.valid && sizeValid) {
+      /** default template until file is loading */
+      fileObj = {
+        _id: randId,
+        loading: true,
+        name: file.name,
+        size: filesize(file.size),
+        metadata: {
+          signs: [],
+          title: file.name
+        }
+      }
       setFile(fileObj)
       const fileFromServer = await uploadMutation[0]({
         variables: { file, metadata }
@@ -88,7 +100,7 @@ const FilesProvider = props => {
     } catch (error) {
       notifyServer({
         Content: () => {
-          return <span>{error.graphQLErrors[0].message}</span>
+          return <span>{error.graphQLErrors ? error.graphQLErrors[0].message : "Ошибка подписи, повторите попытку позже"}</span>
         },
         type: "error"
       })

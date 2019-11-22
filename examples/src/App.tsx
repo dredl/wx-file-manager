@@ -42,14 +42,13 @@ const App: React.FC = () => {
           <FileUploader
             // uploadText="Зерновая раскписка"
             file={file}
-            needToSign={false}
             handleUpload={file => setFile(file)}
             handleRemove={fileId => setFile(null)}
             handleSign={file => setFile(file)}
-            enableRemove={false}
             objType={101}
             objCode={"G-fkkf"}
             tool="uploader"
+            // maxFileSize={1024 * 1024 * 0.5}
             extensions=".pdf, .png"
             userId="5cb8652b66976e8dd10c5a6a"
           />
@@ -80,7 +79,7 @@ const App: React.FC = () => {
             //   )
             // }}
           /> */}
-          <FileUploader
+          {/* <FileUploader
             file={file2}
             tool="uploader"
             handleUpload={file => setFile2(file)}
@@ -89,7 +88,7 @@ const App: React.FC = () => {
             objType={101}
             enableFakeRemove={true}
             handleFakeRemove={fileId => console.log("fakeRemove", fileId)}
-          />
+          /> */}
         </div>
       </header>
     </div>

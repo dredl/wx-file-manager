@@ -6,6 +6,7 @@ import addFile from "../assets/add-file.svg"
 import "./index.scss"
 import LogoUploader from "./logo-uploader"
 import { messages } from "./i18n"
+import filesize from "filesize"
 interface IFileUploader {
   theme?: string
   uploadText?: string
@@ -24,12 +25,14 @@ interface IFileUploader {
   needToSign?: boolean
   enableFakeRemove?: boolean
   handleFakeRemove?: any
+  maxFileSize?: number
 }
 
 /**
  * @param theme Есть 2 вида загрузчика: 1. Стандарный 2. Серая кнопка
  * @param uploadText Заголовок загрузчика
  * @param objId ID связанного объекта
+ * @param maxFileSize максимальный размер загружаемого файла
  * @param objCode Code связанного объекта
  * @param objType Тип связанного объекта (Товар Сделка Торги и тд)
  * @param handleUpload ок
@@ -44,121 +47,125 @@ interface IFileUploader {
  * @param handleFakeRemove Обработчик ложного удаления файла. Доступно только когда tool="viewer"
  * TODO: нужно сделать еще fakeRemove. Например, когда ползователь редактурет товар, при нажатии кнопки УДАЛИТЬ не должен удалять файл из сервера до тех пор пока не созранить форму
  * TODO: сделать ограничения по размеру файла, по умолчанию сделать 5MB
- * TODO: нужно сделать такую тему, что када клиенту нужно загрузить file и не нужно ее подписывать, а галочка уже была. Сейчас эта работает только с нерезидентом (реализовано на сервере)
  * TODO: нужно реализовать loading у removeMutation и signMutation
  */
 const FileUploader: React.FC<IFileUploader> = props => {
+  const {file,userId = null} = props
+
+  return (
+    <FileProvider file={file} userId={userId}>
+      <RenderContent {...props} />
+    </FileProvider>
+  )
+}
+const RenderContent: React.FC<IFileUploader> = props => {
   const {
     theme = "default",
     uploadText = null,
     objId = "",
     objCode = "",
     objType = 999,
-    file,
     ExtraContent = null,
     handleUpload = null,
     handleRemove = null,
     handleSign = null,
     tool = "viewer",
     enableRemove = null,
-    userId = null,
     extensions = "*",
     needToSign = true,
     enableFakeRemove = false,
-    handleFakeRemove = null
+    handleFakeRemove = null,
+    maxFileSize = 1024 * 1024 * 5
   } = props
+
   const randInd = Math.floor(Math.random() * (10000 - 1)) + 1
   const language = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "ru"
-  const RenderContent = () => {
-    const fileContext = useContext(FilesContext).file
-    if (tool == "viewer") {
-      return (
-        <FileManager
-          file={fileContext}
-          handleRemove={handleRemove}
-          handleSign={handleSign}
-          ExtraContent={ExtraContent}
-          enableFakeRemove={enableFakeRemove}
-          handleFakeRemove={handleFakeRemove}
-        />
-      )
-    }
+  const fileContext = useContext(FilesContext).file
+  /**Если нужно загружать файл */
+  const handleUploadContext = useContext(FilesContext).handleUpload
 
-    /**Если нужно загрудать файл */
-
-    const handleUploadContext = useContext(FilesContext).handleUpload
-
-    const upload = async (e, { objId, objType }) => {
-      e.preventDefault()
-      const file = await handleUploadContext(e, { objId, objType, objCode, needToSign })
-      handleUpload && handleUpload(file)
-    }
-    if (tool == "logo-manager") {
-      return (
-        <LogoUploader
-          handleUpload={e => upload(e, { objId, objType })}
-          handleRemove={handleRemove}
-          file={fileContext}
-        />
-      )
-    }
-    const loading = fileContext ? fileContext.loading : false
-    /** Если файла нет и файл не грузиться на сервер, показать загрузчик */
-    if (!fileContext && !loading) {
-      if (theme == "inactive-button") {
-        return (
-          <label htmlFor={"mad-file-upload-" + randInd} className="jbtn jbtn-green mad-uploader-button">
-            {uploadText}
-            {extensions != "*" && <span style={{ fontFamily: "dinpro-med" }}> ({extensions})</span>}
-            <input
-              type="file"
-              name="mad-file"
-              id={"mad-file-upload-" + randInd}
-              required
-              onChange={e => upload(e, { objId, objType })}
-              accept={extensions}
-            />
-          </label>
-        )
-      } else {
-        return (
-          <div className="mad-uploader-select-file">
-            {uploadText && <p>{uploadText}</p>}
-            <input
-              type="file"
-              name="mad-file"
-              id={"mad-file-upload-" + randInd}
-              accept={extensions}
-              required
-              onChange={e => upload(e, { objId, objType })}
-            />
-            <label htmlFor={"mad-file-upload-" + randInd}>
-              <div className="mad-uploader-load">
-                <img src={addFile} alt="" />
-                <span>{messages[language].chooseFile}</span>
-                {extensions != "*" && <span style={{ color: "#B3B3B3", marginLeft: "5px" }}>({extensions})</span>}
-              </div>
-            </label>
-          </div>
-        )
-      }
-    }
-
+  const upload = async (e, { objId, objType }) => {
+    e.preventDefault()
+    const file = await handleUploadContext(e, { objId, objType, objCode, needToSign, maxFileSize })
+    handleUpload && handleUpload(file)
+  }
+  // Если пропс tool не отправлен, автоматом появляется viewer
+  if (tool == "viewer") {
     return (
       <FileManager
-        enableRemove={enableRemove != null ? enableRemove : true}
-        enableFakeRemove={enableFakeRemove}
-        handleFakeRemove={handleFakeRemove}
         file={fileContext}
         handleRemove={handleRemove}
         handleSign={handleSign}
+        ExtraContent={ExtraContent}
+        enableFakeRemove={enableFakeRemove}
+        handleFakeRemove={handleFakeRemove}
       />
     )
   }
+
+  if (tool == "logo-manager") {
+    return (
+      <LogoUploader
+        handleUpload={e => upload(e, { objId, objType })}
+        handleRemove={handleRemove}
+        file={fileContext}
+      />
+    )
+  }
+
+  const loading = fileContext ? fileContext.loading : false
+
+  /** Если файла нет и файл не грузиться на сервер, показать загрузчик */
+  if (!fileContext && !loading) {
+    if (theme == "inactive-button") {
+      return (
+        <label htmlFor={"mad-file-upload-" + randInd} className="jbtn jbtn-green mad-uploader-button">
+          {uploadText} {" "}
+          {extensions != "*" && <span style={{ fontFamily: "dinpro-med" }}> ({extensions}, {filesize(maxFileSize)})</span>}
+          <input
+            type="file"
+            name="mad-file"
+            id={"mad-file-upload-" + randInd}
+            required
+            onChange={e => upload(e, { objId, objType })}
+            accept={extensions}
+          />
+        </label>
+      )
+    } else {
+      return (
+        <div className="mad-uploader-select-file">
+          {uploadText && <p>{uploadText}</p>}
+          <input
+            type="file"
+            name="mad-file"
+            id={"mad-file-upload-" + randInd}
+            accept={extensions}
+            key={Date.now()}
+            required
+            onChange={e => upload(e, { objId, objType })}
+          />
+          <label htmlFor={"mad-file-upload-" + randInd}>
+            <div className="mad-uploader-load">
+              <img src={addFile} alt="" />
+              <span>{messages[language].chooseFile}</span>
+              {extensions != "*" && <span style={{ color: "#B3B3B3", marginLeft: "5px" }}>({extensions}, {filesize(maxFileSize)})</span>}
+            </div>
+          </label>
+        </div>
+      )
+    }
+  }
+  // Файл загружен на сервер, показать FileViewer
   return (
-    <FileProvider file={file} userId={userId}>
-      <RenderContent />
-    </FileProvider>
+    <FileManager
+      enableRemove={enableRemove != null ? enableRemove : true}
+      enableFakeRemove={enableFakeRemove}
+      handleFakeRemove={handleFakeRemove}
+      file={fileContext}
+      handleRemove={handleRemove}
+      handleSign={handleSign}
+    />
   )
 }
 export default FileUploader

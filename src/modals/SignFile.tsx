@@ -7,19 +7,23 @@ import { useMutation } from "react-apollo"
 import { CHECK_EDS_DATA } from "../queries"
 import { gatewayClient } from "../apollo-client-2"
 import { messages } from "../i18n"
+import "./index.scss"
+import loader from "../../assets/loader-white.gif"
 const language = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "ru"
 
 const SignFile = props => {
   const [modal, setModal] = useState(false)
   const [modal2, setModal2] = useState(false)
-  const [password, setPassword] = useState({ value: "WessarIT12", isValid: false })
+  const [password, setPassword] = useState({ value: "Qwerty12", isValid: false })
   const [p12Base64, setP12Base64] = useState(null)
   const [signLoading, setSignLoading] = useState(false) //loader загрузки при подписи данных (если файл большой, она долго подписывается)
 
   useEffect(() => {
-    // console.log("mounter")
+    // console.log("Sign File mounted")
     return () => {
-      // console.log("unmounted")
+      setSignLoading(false)
+      setModal(false)
+      // console.log("Sign File unmounted")
     }
   }, [])
 
@@ -53,9 +57,8 @@ const SignFile = props => {
 
   const handleSign = async (e, fileId) => {
     e.preventDefault()
-    // setSignLoading(true)
+    setSignLoading(true)
     const file = await handleSignContext(fileId, p12Base64, password.value)
-    // setSignLoading(false)
     handleSignParent && handleSignParent(file)
   }
   const handleEDS = e => {
@@ -87,9 +90,7 @@ const SignFile = props => {
           Content: () => {
             return (
               <ul style={{ padding: 0, margin: 0 }}>
-                {errors.map((error, key) => {
-                  return <li key={key}>{error.message}</li>
-                })}
+                {errors ? errors.map((error, key) => (<li key={key}>{error.message}</li>) ): "Не удалось проверить данные. Повторите позже"}
               </ul>
             )
           },
@@ -99,9 +100,6 @@ const SignFile = props => {
   }
   const RenderContent = () => {
     const randInd = Math.floor(Math.random() * (10000 - 1)) + 1
-    if (loading) {
-      return <p>Получаем данные ЭЦП...</p>
-    }
 
     if (EDSdata) {
       return (
@@ -153,10 +151,9 @@ const SignFile = props => {
           {messages[language].sign}
         </button>
       </div>
-      <Modal isOpen={modal} className="prompt" centered={true} toggle={toggle}>
+      <Modal isOpen={modal} className="prompt" centered={true} toggle={toggle} backdrop="static">
         <ModalHeader>Подписание документа</ModalHeader>
-        {signLoading && <p>Sign LADING</p>}
-        {/* <StdLoader type="modal" /> */}
+        {(signLoading  || loading )&& <StdLoader type="modal" text="Подписание файла, подождите" /> }
         <form className="mad-form" onSubmit={e => handleSign(e, file._id)}>
           <ModalBody>
             <p style={{ fontFamily: "dinpro-med", fontSize: "13px", lineHeight: "1.3" }}>
@@ -181,6 +178,8 @@ const SignFile = props => {
 
       <Modal isOpen={modal2} className="eds-pass" centered={true} backdrop={true}>
         <form className="mad-form" onSubmit={e => handlePasswordSubmit(e)}>
+        {loading && <StdLoader type="eds"/> }
+
           <ModalBody>
             <InputStyleOne
               label="Пароль ЭЦП"
@@ -212,7 +211,8 @@ const StdLoader: FC<any> = ({ type = "", text }) => {
     <div className={clazz}>
       <div className="loader__content">
         <p className="loader__spinner">
-          <span className="loader__img" />
+          <img src={loader} className="loader__img" alt=""/>
+          {/* <span className="loader__img" /> */}
         </p>
         {text && <p className="loader__text">{text}</p>}
       </div>

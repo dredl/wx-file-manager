@@ -1,7 +1,7 @@
 import typescript from "rollup-plugin-typescript2"
 import postcss from "rollup-plugin-postcss"
 import pkg from "./package.json"
-import svg from "rollup-plugin-svg"
+import image from '@rollup/plugin-image';
 import resolve from "rollup-plugin-node-resolve"
 export default {
   input: "src/index.tsx",
@@ -25,6 +25,6 @@ export default {
       minimize: true,
       sourceMap: "inline"
     }),
-    svg({ base64: true })
+    image()
   ]
 }
