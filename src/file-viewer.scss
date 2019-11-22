@@ -1,0 +1,145 @@
+@import "./styles/fonts";
+.documents-tab {
+  .f-manager {
+	width: 100%;
+	height: auto;
+  }
+}
+.f-manager {
+  display: flex;
+  flex-direction: column;
+  margin: 10px 0;
+  .jbtn {
+    height: 35px;
+  }
+  .sign-button {
+	margin-top: 10px;
+	margin-left: auto;
+  }
+  &__block {
+    position: relative;
+    padding: 0px 12px;
+    display: flex;
+    border-radius: 5px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.32);
+    background: #FFFFFF;
+    height: 46px;
+	justify-content: space-between;
+	&_right {
+    display: flex;
+    align-items: center;
+	}
+    &_item1 {
+      padding-left: 0;
+      margin-right: 15px;
+      width: 100%;
+      align-items: center;
+      display: flex;
+      // min-width: 150px;
+      // max-width: 350px;
+      overflow: hidden;
+      .item1-text {
+        overflow: hidden;
+        width: 60%;
+        display: grid;
+        flex-direction: column;
+        align-items: start;
+        padding: 0;
+        line-height: 1.2;
+        p {
+          line-height: 1;
+          margin: 0;
+          font-size: 15px;
+          font-family: $font_bold;
+          color: #333333;
+          white-space: nowrap; /* Запрещаем перенос строк */
+          overflow: hidden; /* Обрезаем все, что не помещается в область */
+          width: 100%;
+          text-overflow: ellipsis; /* Добавляем многоточие */
+        }
+        span {
+          font-size: 11px;
+          color: #B3B3B3;
+          font-family: $font_med;
+          text-align: left;
+        }
+      }
+      p {
+        margin-bottom: 0;
+      }
+      img {
+        width: 21px;
+        height: 21px;
+        margin-right: 10px;
+      }
+    }
+    &_item4 {
+      box-shadow: none;
+      background-color: transparent;
+      
+      
+      border-left: 1px solid #CCCCCC;
+      padding-left: 10px;
+      padding-right: 0;
+      display: flex;
+      align-items: center;
+      height: 65%;
+      a {
+        color: #333333;
+        font-family: $font_med;
+        text-decoration: none;
+        font-size: 14px;
+      }
+    }
+    &_new-doc {
+      text-transform: uppercase;
+      font-size: 10px;
+      border-top-right-radius: 5px;
+      border-bottom-right-radius: 5px;
+      padding: 3px 15px;
+      line-height: 1;
+      color: white;
+      font-family: $font_bold;
+      height: 20px;
+      margin: auto;
+      position: absolute;
+      right: 0;
+      top: 14px;
+      margin-right: -118px;
+      background: linear-gradient(135deg, transparent 8px, #8D1843 0) top left,
+      linear-gradient(45deg, transparent 8px, #8D1843 0) bottom left;
+      background-size: 100% 50%;
+      background-repeat: no-repeat;
+    }
+    &_remove {
+      cursor: pointer;
+      border-left: 1px solid #CCCCCC;
+      padding: 0 7px 0 16px;
+      background: white;
+      margin-left: 10px;
+      display: flex;
+      height: 65%;
+      img {
+        width: 15px;
+      }
+    }
+    &_status {
+      margin-bottom: 0;
+      font-size: 12px;
+      display: flex;
+      line-height: 1;
+      align-items: center;
+      font-family: $font_med;
+      color: #808080;
+      max-width: 176px;
+      border-left: 1px solid #CCCCCC;
+      padding-left: 10px;
+      padding-right: 10px;
+      height: 65%;
+      img {
+        width: 15px;
+        margin-right: 10px;
+      }
+    }
+  }
+}

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="160"
+   height="160"
+   viewBox="0 0 42.333332 42.333335"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.1 r15371"
+   sodipodi:docname="galka.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.4311995"
+     inkscape:cx="111.11678"
+     inkscape:cy="65.230449"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="1153"
+     inkscape:window-height="745"
+     inkscape:window-x="563"
+     inkscape:window-y="79"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-254.66665)">
+    <g
+       id="g3816"
+       transform="matrix(1.1024277,0,0,1.1024277,6.6145662e-4,254.66654)">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3802"
+         style="fill:#45a125;fill-rule:evenodd"
+         d="M -6e-4,15.1975 14.4527,33.2037 38.4002,5.1962 13.8489,22.7703 Z" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3804"
+         style="fill:none"
+         d="M 1e-4,1e-4 V 38.4002 H 38.4002 V 1e-4 Z" />
+    </g>
+  </g>
+</svg>
