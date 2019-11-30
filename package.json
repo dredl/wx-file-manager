@@ -1,6 +1,6 @@
 {
   "name": "wx-file-manager",
-  "version": "1.3.23",
+  "version": "1.3.27",
   "description": "File Uploader Specially created for Wexport.com project",
   "main": "dist/index.js",
   "files": [

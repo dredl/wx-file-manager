@@ -48,9 +48,10 @@ const App: React.FC = () => {
             objType={101}
             objCode={"G-fkkf"}
             tool="uploader"
+            needToSign={true}
             // maxFileSize={1024 * 1024 * 0.5}
             extensions=".pdf, .png"
-            userId="5cb8652b66976e8dd10c5a6a"
+            userId="5de28370ab07a10b197efc84"
           />
           {/* <FileUploader
             uploadText="Зерновая раскписка"

@@ -59,7 +59,13 @@ const SignFile = props => {
     e.preventDefault()
     setSignLoading(true)
     const file = await handleSignContext(fileId, p12Base64, password.value)
-    handleSignParent && handleSignParent(file)
+    setSignLoading(false)
+    if (file) {
+      handleSignParent && handleSignParent(file)
+      setModal(false)
+    } else {
+      setEDSData(null)
+    }
   }
   const handleEDS = e => {
     e.preventDefault()
@@ -90,7 +96,9 @@ const SignFile = props => {
           Content: () => {
             return (
               <ul style={{ padding: 0, margin: 0 }}>
-                {errors ? errors.map((error, key) => (<li key={key}>{error.message}</li>) ): "Не удалось проверить данные. Повторите позже"}
+                {errors
+                  ? errors.map((error, key) => <li key={key}>{error.message}</li>)
+                  : "Не удалось проверить данные. Повторите позже"}
               </ul>
             )
           },
@@ -153,7 +161,7 @@ const SignFile = props => {
       </div>
       <Modal isOpen={modal} className="prompt" centered={true} toggle={toggle} backdrop="static">
         <ModalHeader>Подписание документа</ModalHeader>
-        {(signLoading  || loading )&& <StdLoader type="modal" text="Подписание файла, подождите" /> }
+        {(signLoading || loading) && <StdLoader type="modal" text="Подписание файла, подождите" />}
         <form className="mad-form" onSubmit={e => handleSign(e, file._id)}>
           <ModalBody>
             <p style={{ fontFamily: "dinpro-med", fontSize: "13px", lineHeight: "1.3" }}>
@@ -178,7 +186,7 @@ const SignFile = props => {
 
       <Modal isOpen={modal2} className="eds-pass" centered={true} backdrop={true}>
         <form className="mad-form" onSubmit={e => handlePasswordSubmit(e)}>
-        {loading && <StdLoader type="eds"/> }
+          {loading && <StdLoader type="eds" />}
 
           <ModalBody>
             <InputStyleOne
@@ -211,7 +219,17 @@ const StdLoader: FC<any> = ({ type = "", text }) => {
     <div className={clazz}>
       <div className="loader__content">
         <p className="loader__spinner">
-          <img src={loader} className="loader__img" alt=""/>
+          <img
+            src={loader}
+            style={{
+              position: "absolute",
+              width: "40px",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)"
+            }}
+            alt=""
+          />
           {/* <span className="loader__img" /> */}
         </p>
         {text && <p className="loader__text">{text}</p>}

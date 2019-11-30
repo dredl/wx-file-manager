@@ -25,7 +25,6 @@ const FilesProvider = props => {
     setFile(props.file)
   }, [props.file])
   const upload = async (e, { objId, objType, objCode, needToSign, maxFileSize }) => {
-
     const {
       validity,
       files: [file]
@@ -41,12 +40,12 @@ const FilesProvider = props => {
 
     const randId = Math.floor(Math.random() * (10000 - 1)) + 1
 
-    if (validity.valid && file.size > maxFileSize ) {
+    if (validity.valid && file.size > maxFileSize) {
       notifyServer({
         type: "error",
         Content: () => {
           return <span>Загружаемый файл превышаеть допустимый лимит {filesize(maxFileSize)}</span>
-        },
+        }
       })
       e.target.value = null
       sizeValid = false
@@ -100,18 +99,24 @@ const FilesProvider = props => {
     } catch (error) {
       notifyServer({
         Content: () => {
-          return <span>{error.graphQLErrors ? error.graphQLErrors[0].message : "Ошибка подписи, повторите попытку позже"}</span>
+          return (
+            <span>
+              {error.graphQLErrors ? error.graphQLErrors[0].message : "Ошибка подписи, повторите попытку позже"}
+            </span>
+          )
         },
         type: "error"
       })
     }
-
-    notify({
-      header: "Файл подписан",
-      description: "Файл успешно подписан!!!"
-    })
-    setFile(file.data.signDocument)
-    return file.data.signDocument
+    if (file) {
+      notify({
+        header: "Файл подписан",
+        description: "Файл успешно подписан!!!"
+      })
+      setFile(file.data.signDocument)
+      return file.data.signDocument
+    }
+    return null
   }
   return (
     <FilesContext.Provider

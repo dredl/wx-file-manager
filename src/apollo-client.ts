@@ -6,8 +6,6 @@ import { createUploadLink } from "apollo-upload-client"
 import { setContext } from "apollo-link-context"
 //@ts-ignore
 const globalAny: any = global
-const token = localStorage.getItem("loginToken")
-
 const httpLink = createHttpLink({
   uri: "http://109.233.109.170:4003/graphql"
   // uri: "http://localhost:4003/graphql" //dev only, comment before publish
@@ -21,7 +19,7 @@ const uploadLink = createUploadLink({
 
 const authLink = setContext((_, { headers }) => {
   // get the authentication token from local storage if it exists
-  const token = localStorage.getItem("loginToken")
+  const token = getCookie("loginToken")
   const language = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "en-US"
   // return the headers to the context so httpLink can read them
   return {
@@ -86,4 +84,20 @@ function customFetch(url, opts = {} as any) {
 
     xhr.send(opts.body)
   })
+}
+
+function getCookie(cname) {
+  var name = cname + "="
+  var decodedCookie = decodeURIComponent(document.cookie)
+  var ca = decodedCookie.split(";")
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i]
+    while (c.charAt(0) == " ") {
+      c = c.substring(1)
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length)
+    }
+  }
+  return ""
 }
