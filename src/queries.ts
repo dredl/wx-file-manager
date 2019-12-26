@@ -1,4 +1,41 @@
 import gql from "graphql-tag"
+export const grainReceiptsData = gql`
+  fragment GrainReceiptsData on GrainReceiptsData {
+    docNumber
+    docTime
+    ownerBIN
+    elevatorBIN
+    specifications {
+      status
+      GRNumber
+      createTime
+      amount
+      culture
+      class
+      cropYear
+      category
+      grade
+      reproduction
+      seedCompositionClass
+      moisture
+      weedyImpurity
+      grainImpurity
+      infection
+      infectionLevel
+      smell
+      color
+      type
+      testWeight
+      gluten
+      glutenCU
+      hoodness
+      fallingNumber
+      protein
+      vitreousness
+      otherIndicators
+    }
+  }
+`
 
 export const fileFragments = {
   common: gql`
@@ -21,13 +58,26 @@ export const fileFragments = {
           label
         }
       }
+      grainReceiptData {
+        ...GrainReceiptsData
+      }
     }
+    ${grainReceiptsData}
   `
 }
 
 export const UPLOADFILE_LINK_MUTATION = gql`
   mutation singleUpload($file: Upload, $metadata: MetadataInput) {
     singleUpload(file: $file, metadata: $metadata) {
+      ...CommonFiles
+    }
+  }
+  ${fileFragments.common}
+`
+
+export const UPLOAD_MULTIPLE_LINK_MUTATION = gql`
+  mutation multipleUpload($files: [Upload], $metadata: MetadataInput) {
+    multipleUpload(files: $files, metadata: $metadata) {
       ...CommonFiles
     }
   }
@@ -43,6 +93,24 @@ export const CHECK_EDS_DATA = gql`
       bin
     }
   }
+`
+
+export const GET_AVERAGE_GRAIN_RECEIPT_DATA = gql`
+  query getAverageGrainReceiptData($fileIds: [String]) {
+    getAverageGrainReceiptData(fileIds: $fileIds) {
+      ...GrainReceiptsData
+    }
+  }
+  ${grainReceiptsData}
+`
+
+export const READ_GRAIN_RECEIPT_DATA = gql`
+  mutation readGrainReceiptData($fileId: String) {
+    readGrainReceiptData(fileId: $fileId) {
+      ...CommonFiles
+    }
+  }
+  ${fileFragments.common}
 `
 export const REMOVE_LINK_MUTATION = gql`
   mutation deleteFile($fileId: String) {

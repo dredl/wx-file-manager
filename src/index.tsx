@@ -1,7 +1,6 @@
 import React, { useContext, useEffect } from "react"
 import FileManager from "./file-viewer"
 import FileProvider, { FilesContext } from "./context"
-import { ToastContainer } from "wx-notify"
 import addFile from "../assets/add-file.svg"
 import "./index.scss"
 import LogoUploader from "./logo-uploader"
@@ -50,7 +49,7 @@ interface IFileUploader {
  * TODO: нужно реализовать loading у removeMutation и signMutation
  */
 const FileUploader: React.FC<IFileUploader> = props => {
-  const {file,userId = null} = props
+  const { file, userId = null } = props
 
   return (
     <FileProvider file={file} userId={userId}>
@@ -87,7 +86,7 @@ const RenderContent: React.FC<IFileUploader> = props => {
   const upload = async (e, { objId, objType }) => {
     e.preventDefault()
     const file = await handleUploadContext(e, { objId, objType, objCode, needToSign, maxFileSize })
-    handleUpload && handleUpload(file)
+    handleUpload && file && handleUpload(file)
   }
   // Если пропс tool не отправлен, автоматом появляется viewer
   if (tool == "viewer") {
@@ -105,11 +104,7 @@ const RenderContent: React.FC<IFileUploader> = props => {
 
   if (tool == "logo-manager") {
     return (
-      <LogoUploader
-        handleUpload={e => upload(e, { objId, objType })}
-        handleRemove={handleRemove}
-        file={fileContext}
-      />
+      <LogoUploader handleUpload={e => upload(e, { objId, objType })} handleRemove={handleRemove} file={fileContext} />
     )
   }
 
@@ -120,8 +115,13 @@ const RenderContent: React.FC<IFileUploader> = props => {
     if (theme == "inactive-button") {
       return (
         <label htmlFor={"mad-file-upload-" + randInd} className="jbtn jbtn-green mad-uploader-button">
-          {uploadText} {" "}
-          {extensions != "*" && <span style={{ fontFamily: "dinpro-med" }}> ({extensions}, {filesize(maxFileSize)})</span>}
+          {uploadText}{" "}
+          {extensions != "*" && (
+            <span style={{ fontFamily: "dinpro-med" }}>
+              {" "}
+              ({extensions}, {filesize(maxFileSize)})
+            </span>
+          )}
           <input
             type="file"
             name="mad-file"
@@ -149,7 +149,11 @@ const RenderContent: React.FC<IFileUploader> = props => {
             <div className="mad-uploader-load">
               <img src={addFile} alt="" />
               <span>{messages[language].chooseFile}</span>
-              {extensions != "*" && <span style={{ color: "#B3B3B3", marginLeft: "5px" }}>({extensions}, {filesize(maxFileSize)})</span>}
+              {extensions != "*" && (
+                <span style={{ color: "#B3B3B3", marginLeft: "5px" }}>
+                  ({extensions}, {filesize(maxFileSize)})
+                </span>
+              )}
             </div>
           </label>
         </div>
@@ -168,4 +172,5 @@ const RenderContent: React.FC<IFileUploader> = props => {
     />
   )
 }
+export * from "./multiple-uploader"
 export default FileUploader

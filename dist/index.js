@@ -1,5 +1,7 @@
 'use strict';
 
+Object.defineProperty(exports, '__esModule', { value: true });
+
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var React = require('react');
@@ -17,6 +19,7 @@ var apolloCacheInmemory = require('apollo-cache-inmemory');
 var apolloLink = require('apollo-link');
 var apolloUploadClient = require('apollo-upload-client');
 var apolloLinkContext = require('apollo-link-context');
+var accepts = _interopDefault(require('attr-accept'));
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -113,28 +116,36 @@ function styleInject(css, ref) {
   }
 }
 
-var css = ".documents-tab .f-manager{width:100%;height:auto}.f-manager{display:flex;flex-direction:column;margin:10px 0}.f-manager .jbtn{height:35px}.f-manager .sign-button{margin-top:10px;margin-left:auto}.f-manager__block{position:relative;padding:0 12px;display:flex;border-radius:5px;box-shadow:0 0 15px rgba(0,0,0,.32);background:#fff;height:46px;justify-content:space-between}.f-manager__block_item1,.f-manager__block_right{display:flex;align-items:center}.f-manager__block_item1{padding-left:0;margin-right:15px;width:100%;overflow:hidden}.f-manager__block_item1 .item1-text{overflow:hidden;width:60%;display:grid;flex-direction:column;align-items:start;padding:0;line-height:1.2}.f-manager__block_item1 .item1-text p{line-height:1;margin:0;font-size:15px;font-family:dinpro-bold;color:#333;white-space:nowrap;overflow:hidden;width:100%;text-overflow:ellipsis}.f-manager__block_item1 .item1-text span{font-size:11px;color:#b3b3b3;font-family:dinpro-med;text-align:left}.f-manager__block_item1 p{margin-bottom:0}.f-manager__block_item1 img{width:21px;height:21px;margin-right:10px}.f-manager__block_item4{box-shadow:none;background-color:transparent;border-left:1px solid #ccc;padding-left:10px;padding-right:0;display:flex;align-items:center;height:65%}.f-manager__block_item4 a{color:#333;font-family:dinpro-med;text-decoration:none;font-size:14px}.f-manager__block_new-doc{text-transform:uppercase;font-size:10px;border-top-right-radius:5px;border-bottom-right-radius:5px;padding:3px 15px;line-height:1;color:#fff;font-family:dinpro-bold;height:20px;position:absolute;right:0;top:14px;margin:auto -118px auto auto;background:linear-gradient(135deg,transparent 8px,#8d1843 0) 0 0,linear-gradient(45deg,transparent 8px,#8d1843 0) 0 100%;background-size:100% 50%;background-repeat:no-repeat}.f-manager__block_remove{cursor:pointer;border-left:1px solid #ccc;padding:0 7px 0 16px;background:#fff;margin-left:10px;display:flex;height:65%}.f-manager__block_remove img{width:15px}.f-manager__block_status{margin-bottom:0;font-size:12px;display:flex;line-height:1;align-items:center;font-family:dinpro-med;color:grey;max-width:176px;border-left:1px solid #ccc;padding-left:10px;padding-right:10px;height:65%}.f-manager__block_status img{width:15px;margin-right:10px}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9maWxlLXZpZXdlci5zY3NzIiwic3JjL3N0eWxlcy9fZm9udHMuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFDQSwwQkFFQyxVQUFXLENBQ1gsV0FBWSxDQUdiLFdBQ0UsWUFBYSxDQUNiLHFCQUFzQixDQUN0QixhQUFjLENBSGhCLGlCQUtJLFdBQVksQ0FMaEIsd0JBUUMsZUFBZ0IsQ0FDaEIsZ0JBQWlCLENBRWhCLGtCQUNFLGlCQUFrQixDQUNsQixjQUFpQixDQUNqQixZQUFhLENBQ2IsaUJBQWtCLENBQ2xCLG1DQUF3QyxDQUN4QyxlQUFtQixDQUNuQixXQUFZLENBQ2YsNkJBQThCLENBSzNCLGdEQUhBLFlBQWEsQ0FDYixrQkFVa0IsQ0FSbEIsd0JBQ0UsY0FBZSxDQUNmLGlCQUFrQixDQUNsQixVQUFXLENBS1gsZUFBZ0IsQ0FSakIsb0NBVUcsZUFBZ0IsQ0FDaEIsU0FBVSxDQUNWLFlBQWEsQ0FDYixxQkFBc0IsQ0FDdEIsaUJBQWtCLENBQ2xCLFNBQVUsQ0FDVixlQUFnQixDQWhCbkIsc0NBa0JLLGFBQWMsQ0FDZCxRQUFTLENBQ1QsY0FBZSxDQUNmLHVCQ25EYSxDRG9EYixVQUFjLENBQ2Qsa0JBQW1CLENBQ25CLGVBQWdCLENBQ2hCLFVBQVcsQ0FDWCxzQkFBbUQsQ0ExQnhELHlDQTZCSyxjQUFlLENBQ2YsYUFBYyxDQUNkLHNCQzlEVyxDRCtEWCxlQUFnQixDQWhDckIsMEJBb0NHLGVBQWdCLENBcENuQiw0QkF1Q0csVUFBVyxDQUNYLFdBQVksQ0FDWixpQkFBa0IsQ0FHdEIsd0JBQ0UsZUFBZ0IsQ0FDaEIsNEJBQTZCLENBRzdCLDBCQUE4QixDQUM5QixpQkFBa0IsQ0FDbEIsZUFBZ0IsQ0FDaEIsWUFBYSxDQUNiLGtCQUFtQixDQUNuQixVQUFXLENBVlosMEJBWUcsVUFBYyxDQUNkLHNCQ3hGYSxDRHlGYixvQkFBcUIsQ0FDckIsY0FBZSxDQUduQiwwQkFDRSx3QkFBeUIsQ0FDekIsY0FBZSxDQUNmLDJCQUE0QixDQUM1Qiw4QkFBK0IsQ0FDL0IsZ0JBQWlCLENBQ2pCLGFBQWMsQ0FDZCxVQUFZLENBQ1osdUJDcEdpQixDRHFHakIsV0FBWSxDQUVaLGlCQUFrQixDQUNsQixPQUFRLENBQ1IsUUFBUyxDQUNULDRCQUFvQixDQUNwQix3SEFDOEQsQ0FDOUQsd0JBQXlCLENBQ3pCLDJCQUE0QixDQUU5Qix5QkFDRSxjQUFlLENBQ2YsMEJBQThCLENBQzlCLG9CQUFxQixDQUNyQixlQUFpQixDQUNqQixnQkFBaUIsQ0FDakIsWUFBYSxDQUNiLFVBQVcsQ0FQWiw2QkFTRyxVQUFXLENBR2YseUJBQ0UsZUFBZ0IsQ0FDaEIsY0FBZSxDQUNmLFlBQWEsQ0FDYixhQUFjLENBQ2Qsa0JBQW1CLENBQ25CLHNCQ25JZSxDRG9JZixVQUFjLENBQ2QsZUFBZ0IsQ0FDaEIsMEJBQThCLENBQzlCLGlCQUFrQixDQUNsQixrQkFBbUIsQ0FDbkIsVUFBVyxDQVpaLDZCQWNHLFVBQVcsQ0FDWCxpQkFBa0IiLCJmaWxlIjoiZmlsZS12aWV3ZXIuc2NzcyJ9 */";
+var css = ".documents-tab .f-manager{width:100%;height:auto}.f-manager{display:flex;flex-direction:column;margin:10px 0;box-shadow:0 0 5px rgba(0,0,0,.32);background:#fff;border-radius:5px}.f-manager .jbtn{height:35px}.f-manager__block{position:relative;padding:0 12px;display:flex;height:46px;justify-content:space-between}.f-manager__block_item1,.f-manager__block_right{display:flex;align-items:center}.f-manager__block_item1{padding-left:0;margin-right:15px;width:100%;overflow:hidden}.f-manager__block_item1 .item1-text{overflow:hidden;width:60%;display:grid;flex-direction:column;align-items:start;padding:0;line-height:1.2}.f-manager__block_item1 .item1-text p{line-height:1.2;margin:0;font-size:15px;font-family:dinpro-bold;color:#333;white-space:nowrap;overflow:hidden;width:100%;text-overflow:ellipsis}.f-manager__block_item1 .item1-text span{font-size:11px;color:#b3b3b3;font-family:dinpro-med;text-align:left}.f-manager__block_item1 p{margin-bottom:0}.f-manager__block_item1 img{width:21px;height:21px;margin-right:10px}.f-manager__block_item4{box-shadow:none;background-color:transparent;border-left:1px solid #ccc;padding-left:10px;padding-right:0;display:flex;align-items:center;height:65%}.f-manager__block_item4 a{color:#333;font-family:dinpro-med;text-decoration:none;font-size:14px}.f-manager__block_new-doc{text-transform:uppercase;font-size:10px;border-top-right-radius:5px;border-bottom-right-radius:5px;padding:3px 15px;line-height:1;color:#fff;font-family:dinpro-bold;height:20px;position:absolute;right:0;top:14px;margin:auto -118px auto auto;background:linear-gradient(135deg,transparent 8px,#8d1843 0) 0 0,linear-gradient(45deg,transparent 8px,#8d1843 0) 0 100%;background-size:100% 50%;background-repeat:no-repeat}.f-manager__block_remove{cursor:pointer;border-left:1px solid #ccc;padding:0 7px 0 16px;background:#fff;margin-left:10px;display:flex;height:65%}.f-manager__block_remove img{width:15px}.f-manager__block_status{margin-bottom:0;font-size:12px;display:flex;line-height:1;align-items:center;font-family:dinpro-med;color:grey;max-width:176px;border-left:1px solid #ccc;padding-left:10px;padding-right:10px;height:65%}.f-manager__block_status img{width:15px;margin-right:5px}.sign-button{margin-top:10px;display:flex;justify-content:flex-end}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9maWxlLXZpZXdlci5zY3NzIiwic3JjL3N0eWxlcy9fZm9udHMuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFDQSwwQkFFQyxVQUFXLENBQ1gsV0FBWSxDQUdiLFdBQ0UsWUFBYSxDQUNiLHFCQUFzQixDQUN0QixhQUFjLENBQ2Qsa0NBQXVDLENBQ3ZDLGVBQWlCLENBQ2pCLGlCQUFrQixDQU5wQixpQkFRSSxXQUFZLENBRWQsa0JBQ0UsaUJBQWtCLENBQ2xCLGNBQWlCLENBQ2pCLFlBQWEsQ0FDYixXQUFZLENBQ2YsNkJBQThCLENBSzNCLGdEQUhBLFlBQWEsQ0FDYixrQkFVa0IsQ0FSbEIsd0JBQ0UsY0FBZSxDQUNmLGlCQUFrQixDQUNsQixVQUFXLENBS1gsZUFBZ0IsQ0FSakIsb0NBVUcsZUFBZ0IsQ0FDaEIsU0FBVSxDQUNWLFlBQWEsQ0FDYixxQkFBc0IsQ0FDdEIsaUJBQWtCLENBQ2xCLFNBQVUsQ0FDVixlQUFnQixDQWhCbkIsc0NBa0JLLGVBQWdCLENBQ2hCLFFBQVMsQ0FDVCxjQUFlLENBQ2YsdUJDL0NhLENEZ0RiLFVBQWMsQ0FDZCxrQkFBbUIsQ0FDbkIsZUFBZ0IsQ0FDaEIsVUFBVyxDQUNYLHNCQUFtRCxDQTFCeEQseUNBNkJLLGNBQWUsQ0FDZixhQUFjLENBQ2Qsc0JDMURXLENEMkRYLGVBQWdCLENBaENyQiwwQkFvQ0csZUFBZ0IsQ0FwQ25CLDRCQXVDRyxVQUFXLENBQ1gsV0FBWSxDQUNaLGlCQUFrQixDQUd0Qix3QkFDRSxlQUFnQixDQUNoQiw0QkFBNkIsQ0FHN0IsMEJBQThCLENBQzlCLGlCQUFrQixDQUNsQixlQUFnQixDQUNoQixZQUFhLENBQ2Isa0JBQW1CLENBQ25CLFVBQVcsQ0FWWiwwQkFZRyxVQUFjLENBQ2Qsc0JDcEZhLENEcUZiLG9CQUFxQixDQUNyQixjQUFlLENBR25CLDBCQUNFLHdCQUF5QixDQUN6QixjQUFlLENBQ2YsMkJBQTRCLENBQzVCLDhCQUErQixDQUMvQixnQkFBaUIsQ0FDakIsYUFBYyxDQUNkLFVBQVksQ0FDWix1QkNoR2lCLENEaUdqQixXQUFZLENBRVosaUJBQWtCLENBQ2xCLE9BQVEsQ0FDUixRQUFTLENBQ1QsNEJBQW9CLENBQ3BCLHdIQUM4RCxDQUM5RCx3QkFBeUIsQ0FDekIsMkJBQTRCLENBRTlCLHlCQUNFLGNBQWUsQ0FDZiwwQkFBOEIsQ0FDOUIsb0JBQXFCLENBQ3JCLGVBQWlCLENBQ2pCLGdCQUFpQixDQUNqQixZQUFhLENBQ2IsVUFBVyxDQVBaLDZCQVNHLFVBQVcsQ0FHZix5QkFDRSxlQUFnQixDQUNoQixjQUFlLENBQ2YsWUFBYSxDQUNiLGFBQWMsQ0FDZCxrQkFBbUIsQ0FDbkIsc0JDL0hlLENEZ0lmLFVBQWMsQ0FDZCxlQUFnQixDQUNoQiwwQkFBOEIsQ0FDOUIsaUJBQWtCLENBQ2xCLGtCQUFtQixDQUNuQixVQUFXLENBWlosNkJBY0csVUFBVyxDQUNYLGdCQUFpQixDQUt6QixhQUNFLGVBQWdCLENBQ2hCLFlBQWEsQ0FDYix3QkFBeUIiLCJmaWxlIjoiZmlsZS12aWV3ZXIuc2NzcyJ9 */";
 styleInject(css);
 
+var grainReceiptsData = gql(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  fragment GrainReceiptsData on GrainReceiptsData {\n    docNumber\n    docTime\n    ownerBIN\n    elevatorBIN\n    specifications {\n      status\n      GRNumber\n      createTime\n      amount\n      culture\n      class\n      cropYear\n      category\n      grade\n      reproduction\n      seedCompositionClass\n      moisture\n      weedyImpurity\n      grainImpurity\n      infection\n      infectionLevel\n      smell\n      color\n      type\n      testWeight\n      gluten\n      glutenCU\n      hoodness\n      fallingNumber\n      protein\n      vitreousness\n      otherIndicators\n    }\n  }\n"], ["\n  fragment GrainReceiptsData on GrainReceiptsData {\n    docNumber\n    docTime\n    ownerBIN\n    elevatorBIN\n    specifications {\n      status\n      GRNumber\n      createTime\n      amount\n      culture\n      class\n      cropYear\n      category\n      grade\n      reproduction\n      seedCompositionClass\n      moisture\n      weedyImpurity\n      grainImpurity\n      infection\n      infectionLevel\n      smell\n      color\n      type\n      testWeight\n      gluten\n      glutenCU\n      hoodness\n      fallingNumber\n      protein\n      vitreousness\n      otherIndicators\n    }\n  }\n"])));
 var fileFragments = {
-    common: gql(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n    fragment CommonFiles on Files {\n      _id\n      path\n      name\n      size\n      createTime\n      metadata {\n        title\n        objId\n        objType\n        creatorId\n        categoryId\n        signs {\n          userId\n          time\n          signed\n          label\n        }\n      }\n    }\n  "], ["\n    fragment CommonFiles on Files {\n      _id\n      path\n      name\n      size\n      createTime\n      metadata {\n        title\n        objId\n        objType\n        creatorId\n        categoryId\n        signs {\n          userId\n          time\n          signed\n          label\n        }\n      }\n    }\n  "])))
+    common: gql(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n    fragment CommonFiles on Files {\n      _id\n      path\n      name\n      size\n      createTime\n      metadata {\n        title\n        objId\n        objType\n        creatorId\n        categoryId\n        signs {\n          userId\n          time\n          signed\n          label\n        }\n      }\n      grainReceiptData {\n        ...GrainReceiptsData\n      }\n    }\n    ", "\n  "], ["\n    fragment CommonFiles on Files {\n      _id\n      path\n      name\n      size\n      createTime\n      metadata {\n        title\n        objId\n        objType\n        creatorId\n        categoryId\n        signs {\n          userId\n          time\n          signed\n          label\n        }\n      }\n      grainReceiptData {\n        ...GrainReceiptsData\n      }\n    }\n    ", "\n  "])), grainReceiptsData)
 };
-var UPLOADFILE_LINK_MUTATION = gql(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  mutation singleUpload($file: Upload, $metadata: MetadataInput) {\n    singleUpload(file: $file, metadata: $metadata) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"], ["\n  mutation singleUpload($file: Upload, $metadata: MetadataInput) {\n    singleUpload(file: $file, metadata: $metadata) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"])), fileFragments.common);
-var CHECK_EDS_DATA = gql(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  mutation checkEDSData($p12Base64: String, $password: String) {\n    checkEDSData(p12Base64: $p12Base64, password: $password) {\n      owner\n      issuer\n      expireTime\n      iin\n      bin\n    }\n  }\n"], ["\n  mutation checkEDSData($p12Base64: String, $password: String) {\n    checkEDSData(p12Base64: $p12Base64, password: $password) {\n      owner\n      issuer\n      expireTime\n      iin\n      bin\n    }\n  }\n"])));
-var REMOVE_LINK_MUTATION = gql(templateObject_4 || (templateObject_4 = __makeTemplateObject(["\n  mutation deleteFile($fileId: String) {\n    deleteUpload(fileId: $fileId)\n  }\n"], ["\n  mutation deleteFile($fileId: String) {\n    deleteUpload(fileId: $fileId)\n  }\n"])));
-var SIGN_FILE = gql(templateObject_5 || (templateObject_5 = __makeTemplateObject(["\n  mutation signDocument($fileId: String, $p12Base64: String, $password: String) {\n    signDocument(fileId: $fileId, p12Base64: $p12Base64, password: $password) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"], ["\n  mutation signDocument($fileId: String, $p12Base64: String, $password: String) {\n    signDocument(fileId: $fileId, p12Base64: $p12Base64, password: $password) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"])), fileFragments.common);
-var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5;
+var UPLOADFILE_LINK_MUTATION = gql(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  mutation singleUpload($file: Upload, $metadata: MetadataInput) {\n    singleUpload(file: $file, metadata: $metadata) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"], ["\n  mutation singleUpload($file: Upload, $metadata: MetadataInput) {\n    singleUpload(file: $file, metadata: $metadata) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"])), fileFragments.common);
+var UPLOAD_MULTIPLE_LINK_MUTATION = gql(templateObject_4 || (templateObject_4 = __makeTemplateObject(["\n  mutation multipleUpload($files: [Upload], $metadata: MetadataInput) {\n    multipleUpload(files: $files, metadata: $metadata) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"], ["\n  mutation multipleUpload($files: [Upload], $metadata: MetadataInput) {\n    multipleUpload(files: $files, metadata: $metadata) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"])), fileFragments.common);
+var CHECK_EDS_DATA = gql(templateObject_5 || (templateObject_5 = __makeTemplateObject(["\n  mutation checkEDSData($p12Base64: String, $password: String) {\n    checkEDSData(p12Base64: $p12Base64, password: $password) {\n      owner\n      issuer\n      expireTime\n      iin\n      bin\n    }\n  }\n"], ["\n  mutation checkEDSData($p12Base64: String, $password: String) {\n    checkEDSData(p12Base64: $p12Base64, password: $password) {\n      owner\n      issuer\n      expireTime\n      iin\n      bin\n    }\n  }\n"])));
+var GET_AVERAGE_GRAIN_RECEIPT_DATA = gql(templateObject_6 || (templateObject_6 = __makeTemplateObject(["\n  query getAverageGrainReceiptData($fileIds: [String]) {\n    getAverageGrainReceiptData(fileIds: $fileIds) {\n      ...GrainReceiptsData\n    }\n  }\n  ", "\n"], ["\n  query getAverageGrainReceiptData($fileIds: [String]) {\n    getAverageGrainReceiptData(fileIds: $fileIds) {\n      ...GrainReceiptsData\n    }\n  }\n  ", "\n"])), grainReceiptsData);
+var READ_GRAIN_RECEIPT_DATA = gql(templateObject_7 || (templateObject_7 = __makeTemplateObject(["\n  mutation readGrainReceiptData($fileId: String) {\n    readGrainReceiptData(fileId: $fileId) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"], ["\n  mutation readGrainReceiptData($fileId: String) {\n    readGrainReceiptData(fileId: $fileId) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"])), fileFragments.common);
+var REMOVE_LINK_MUTATION = gql(templateObject_8 || (templateObject_8 = __makeTemplateObject(["\n  mutation deleteFile($fileId: String) {\n    deleteUpload(fileId: $fileId)\n  }\n"], ["\n  mutation deleteFile($fileId: String) {\n    deleteUpload(fileId: $fileId)\n  }\n"])));
+var SIGN_FILE = gql(templateObject_9 || (templateObject_9 = __makeTemplateObject(["\n  mutation signDocument($fileId: String, $p12Base64: String, $password: String) {\n    signDocument(fileId: $fileId, p12Base64: $p12Base64, password: $password) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"], ["\n  mutation signDocument($fileId: String, $p12Base64: String, $password: String) {\n    signDocument(fileId: $fileId, p12Base64: $p12Base64, password: $password) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"])), fileFragments.common);
+var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7, templateObject_8, templateObject_9;
 
-//@ts-ignore
-var globalAny = global;
 var httpLink = apolloLinkHttp.createHttpLink({
     uri: "http://109.233.109.170:4003/graphql"
     // uri: "http://localhost:4003/graphql" //dev only, comment before publish
 });
+var customFetch = function (uri, options) {
+    if (options.useUpload) {
+        return uploadFetch(uri, options);
+    }
+    return fetch(uri, options);
+};
 var uploadLink = apolloUploadClient.createUploadLink({
     uri: "http://109.233.109.170:4003/graphql",
     // uri: "http://localhost:4003/graphql" //dev only, comment before publish
-    fetch: typeof window === "undefined" ? globalAny.fetch : customFetch
+    fetch: customFetch
 });
 var authLink = apolloLinkContext.setContext(function (_, _a) {
     var headers = _a.headers;
@@ -174,27 +185,56 @@ var client = new ApolloClient({
         }
     })
 });
-function customFetch(url, opts) {
-    if (opts === void 0) { opts = {}; }
+var parseHeaders = function (rawHeaders) {
+    var headers = new Headers();
+    // Replace instances of \r\n and \n followed by at least one space or horizontal tab with a space
+    // https://tools.ietf.org/html/rfc7230#section-3.2
+    var preProcessedHeaders = rawHeaders.replace(/\r?\n[\t ]+/g, " ");
+    preProcessedHeaders.split(/\r?\n/).forEach(function (line) {
+        var parts = line.split(":");
+        var key = parts.shift().trim();
+        if (key) {
+            var value = parts.join(":").trim();
+            headers.append(key, value);
+        }
+    });
+    return headers;
+};
+var uploadFetch = function (url, options) {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
-        xhr.open(opts.method || "get", url);
-        for (var k in opts.headers || {})
-            xhr.setRequestHeader(k, opts.headers[k]);
-        xhr.onload = function (e) {
-            var eAny = e;
-            resolve({
-                ok: true,
-                text: function () { return Promise.resolve(eAny.target.responseText); },
-                json: function () { return Promise.resolve(JSON.parse(eAny.target.responseText)); }
-            });
+        xhr.onload = function () {
+            var opts = {
+                status: xhr.status,
+                statusText: xhr.statusText,
+                headers: parseHeaders(xhr.getAllResponseHeaders() || "")
+            };
+            opts.url =
+                "responseURL" in xhr
+                    ? xhr.responseURL
+                    : opts.headers.get("X-Request-URL");
+            var body = "response" in xhr ? xhr.response : xhr.responseText;
+            resolve(new Response(body, opts));
         };
-        xhr.onerror = reject;
-        if (xhr.upload)
-            xhr.upload.onprogress = function (event) { return console.log((event.loaded / event.total) * 100 + "% uploaded"); };
-        xhr.send(opts.body);
+        xhr.onerror = function () {
+            reject(new TypeError("Network request failed"));
+        };
+        xhr.ontimeout = function () {
+            reject(new TypeError("Network request failed"));
+        };
+        xhr.open(options.method, url, true);
+        Object.keys(options.headers).forEach(function (key) {
+            xhr.setRequestHeader(key, options.headers[key]);
+        });
+        if (xhr.upload) {
+            xhr.upload.onprogress = options.onProgress;
+        }
+        options.onAbortPossible(function () {
+            xhr.abort();
+        });
+        xhr.send(options.body);
     });
-}
+};
 function getCookie(cname) {
     var name = cname + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
@@ -254,7 +294,7 @@ var FilesProvider = function (props) {
                                     return React__default.createElement("span", null,
                                         "\u0417\u0430\u0433\u0440\u0443\u0436\u0430\u0435\u043C\u044B\u0439 \u0444\u0430\u0439\u043B \u043F\u0440\u0435\u0432\u044B\u0448\u0430\u0435\u0442\u044C \u0434\u043E\u043F\u0443\u0441\u0442\u0438\u043C\u044B\u0439 \u043B\u0438\u043C\u0438\u0442 ",
                                         filesize(maxFileSize));
-                                },
+                                }
                             });
                             e.target.value = null;
                             sizeValid = false;
@@ -328,18 +368,21 @@ var FilesProvider = function (props) {
                     error_1 = _a.sent();
                     notify.notifyServer({
                         Content: function () {
-                            return React__default.createElement("span", null, error_1.graphQLErrors ? error_1.graphQLErrors[0].message : "Ошибка подписи, повторите попытку позже");
+                            return (React__default.createElement("span", null, error_1.graphQLErrors ? error_1.graphQLErrors[0].message : "Ошибка подписи, повторите попытку позже"));
                         },
                         type: "error"
                     });
                     return [3 /*break*/, 4];
                 case 4:
-                    notify__default({
-                        header: "Файл подписан",
-                        description: "Файл успешно подписан!!!"
-                    });
-                    setFile(file.data.signDocument);
-                    return [2 /*return*/, file.data.signDocument];
+                    if (file) {
+                        notify__default({
+                            header: "Файл подписан",
+                            description: "Файл успешно подписан!!!"
+                        });
+                        setFile(file.data.signDocument);
+                        return [2 /*return*/, file.data.signDocument];
+                    }
+                    return [2 /*return*/, null];
             }
         });
     }); };
@@ -425,7 +468,7 @@ var gatewayClient = new ApolloClient({
 var messages = {
     en: {
         "chooseFile": "Choose File",
-        "download": "Download",
+        "download": "View",
         "sign": "Sign",
         "Select the file with EDS": "Select EDS file (GOST)",
         "EDS": "EDS",
@@ -437,7 +480,7 @@ var messages = {
     },
     ru: {
         "chooseFile": "Выберите файл",
-        "download": "Скачать",
+        "download": "Просмотреть",
         "sign": "Подписать",
         "Select the file with EDS": "Выберите файл ЭЦП (GOST)",
         "EDS": "ЭЦП",
@@ -450,7 +493,7 @@ var messages = {
     },
     kk: {
         "chooseFile": "Файлды тандаңыз",
-        "download": "Жүктеу",
+        "download": "Карау",
         "sign": "Қол қою",
         "Select the file with EDS": "ЭЦҚ файлын таңданыз (GOST)",
         "EDS": "ЭЦҚ",
@@ -520,8 +563,13 @@ var SignFile = function (props) {
                 case 1:
                     file = _a.sent();
                     setSignLoading(false);
-                    handleSignParent && handleSignParent(file);
-                    setModal(false);
+                    if (file) {
+                        handleSignParent && handleSignParent(file);
+                        setModal(false);
+                    }
+                    else {
+                        setEDSData(null);
+                    }
                     return [2 /*return*/];
             }
         });
@@ -651,9 +699,14 @@ var StdSpinner = function () {
 };
 var SignFileStatus = function (_a) {
     var signs = _a.signs;
-    return signs.map(function (sign, key) { return (React__default.createElement("div", { className: "f-manager__block_status", key: key },
-        React__default.createElement("img", { src: sign.signed ? img$1 : img$2, alt: "" }),
-        React__default.createElement("span", null, sign.label))); });
+    if (signs.length == 0) {
+        return React__default.createElement(React__default.Fragment, null);
+    }
+    return (React__default.createElement("div", { className: "f-manager__sings", style: { display: "flex", alignItems: "center", justifyContent: "flex-end", height: "46px" } },
+        signs.length > 0 && (React__default.createElement("span", { style: { fontSize: "13px", color: "#333333", fontFamily: "dinpro-bold" } }, "\u041F\u043E\u0434\u043F\u0438\u0441\u0438:")),
+        signs.map(function (sign, key) { return (React__default.createElement("div", { className: "f-manager__block_status", key: key, style: { border: "none" } },
+            React__default.createElement("img", { src: sign.signed ? img$1 : img$2, alt: "" }),
+            React__default.createElement("span", null, sign.label))); })));
 };
 var Download = function (_a) {
     var path = _a.path;
@@ -718,26 +771,27 @@ var Viewer = function (_a) {
         handleFakeRemoveContext(fileId);
         handleFakeRemove(fileId);
     };
-    return (React__default.createElement("div", { className: "f-manager" },
-        React__default.createElement("div", { className: "f-manager__block" },
-            React__default.createElement("div", { className: "f-manager__block_item1" },
-                React__default.createElement("img", { src: img$3, alt: "" }),
-                React__default.createElement("div", { className: "item1-text" },
-                    React__default.createElement("p", { title: fileContext.metadata.title }, fileContext.metadata.title),
-                    React__default.createElement("span", null, fileContext.size))),
-            React__default.createElement("div", { className: "f-manager__block_right" },
-                React__default.createElement(SignFileStatus, { signs: fileContext.metadata.signs }),
-                !isLoading && React__default.createElement(Download, { path: fileContext.path }),
-                !isLoading && ExtraContent && React__default.createElement(ExtraContent, null),
-                !isLoading && enableRemove && React__default.createElement(Remove, { removeDoc: function (e) { return onRemove(e, fileContext._id); } }),
-                enableFakeRemove && React__default.createElement(FakeRemove, { handleFakeRemove: function (e) { return onFakeRemove(e, fileContext._id); } }),
-                isLoading && React__default.createElement(StdSpinner, null))),
+    return (React__default.createElement(React__default.Fragment, null,
+        React__default.createElement("div", { className: "f-manager" },
+            React__default.createElement("div", { className: "f-manager__block" },
+                React__default.createElement("div", { className: "f-manager__block_item1" },
+                    React__default.createElement("img", { src: img$3, alt: "" }),
+                    React__default.createElement("div", { className: "item1-text" },
+                        React__default.createElement("p", { title: fileContext.metadata.title }, fileContext.metadata.title),
+                        React__default.createElement("span", null, fileContext.size))),
+                React__default.createElement("div", { className: "f-manager__block_right" },
+                    !isLoading && React__default.createElement(Download, { path: fileContext.path }),
+                    !isLoading && ExtraContent && React__default.createElement(ExtraContent, null),
+                    !isLoading && enableRemove && React__default.createElement(Remove, { removeDoc: function (e) { return onRemove(e, fileContext._id); } }),
+                    enableFakeRemove && React__default.createElement(FakeRemove, { handleFakeRemove: function (e) { return onFakeRemove(e, fileContext._id); } }),
+                    isLoading && React__default.createElement(StdSpinner, null))),
+            !isLoading && React__default.createElement(SignFileStatus, { signs: file.metadata.signs })),
         needToSign && !signed && React__default.createElement(SignFile, { fileId: file._id, handleSign: handleSign })));
 };
 
 const img$5 = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IS0tIENyZWF0ZWQgd2l0aCBJbmtzY2FwZSAoaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvKSAtLT4NCg0KPHN2Zw0KICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIg0KICAgeG1sbnM6Y2M9Imh0dHA6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL25zIyINCiAgIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyINCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciDQogICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciDQogICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiDQogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSINCiAgIHdpZHRoPSIxNjAiDQogICBoZWlnaHQ9IjE2MCINCiAgIHZpZXdCb3g9IjAgMCA0Mi4zMzMzMzIgNDIuMzMzMzM1Ig0KICAgdmVyc2lvbj0iMS4xIg0KICAgaWQ9InN2ZzgiDQogICBpbmtzY2FwZTp2ZXJzaW9uPSIwLjkyLjEgcjE1MzcxIg0KICAgc29kaXBvZGk6ZG9jbmFtZT0iTGlsRG9jV2l0aFBsdXMuc3ZnIj4NCiAgPGRlZnMNCiAgICAgaWQ9ImRlZnMyIiAvPg0KICA8c29kaXBvZGk6bmFtZWR2aWV3DQogICAgIGlkPSJiYXNlIg0KICAgICBwYWdlY29sb3I9IiNmZmZmZmYiDQogICAgIGJvcmRlcmNvbG9yPSIjNjY2NjY2Ig0KICAgICBib3JkZXJvcGFjaXR5PSIxLjAiDQogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwLjAiDQogICAgIGlua3NjYXBlOnBhZ2VzaGFkb3c9IjIiDQogICAgIGlua3NjYXBlOnpvb209IjAuMzUiDQogICAgIGlua3NjYXBlOmN4PSItNTAxLjQyODU3Ig0KICAgICBpbmtzY2FwZTpjeT0iMjYwIg0KICAgICBpbmtzY2FwZTpkb2N1bWVudC11bml0cz0ibW0iDQogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9ImxheWVyMSINCiAgICAgc2hvd2dyaWQ9ImZhbHNlIg0KICAgICB1bml0cz0icHgiDQogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMTYwMCINCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iODM3Ig0KICAgICBpbmtzY2FwZTp3aW5kb3cteD0iLTgiDQogICAgIGlua3NjYXBlOndpbmRvdy15PSItOCINCiAgICAgaW5rc2NhcGU6d2luZG93LW1heGltaXplZD0iMSIgLz4NCiAgPG1ldGFkYXRhDQogICAgIGlkPSJtZXRhZGF0YTUiPg0KICAgIDxyZGY6UkRGPg0KICAgICAgPGNjOldvcmsNCiAgICAgICAgIHJkZjphYm91dD0iIj4NCiAgICAgICAgPGRjOmZvcm1hdD5pbWFnZS9zdmcreG1sPC9kYzpmb3JtYXQ+DQogICAgICAgIDxkYzp0eXBlDQogICAgICAgICAgIHJkZjpyZXNvdXJjZT0iaHR0cDovL3B1cmwub3JnL2RjL2RjbWl0eXBlL1N0aWxsSW1hZ2UiIC8+DQogICAgICAgIDxkYzp0aXRsZT48L2RjOnRpdGxlPg0KICAgICAgPC9jYzpXb3JrPg0KICAgIDwvcmRmOlJERj4NCiAgPC9tZXRhZGF0YT4NCiAgPGcNCiAgICAgaW5rc2NhcGU6bGFiZWw9IkxheWVyIDEiDQogICAgIGlua3NjYXBlOmdyb3VwbW9kZT0ibGF5ZXIiDQogICAgIGlkPSJsYXllcjEiDQogICAgIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsLTI1NC42NjY2NSkiPg0KICAgIDxnDQogICAgICAgaWQ9Imc0MyINCiAgICAgICB0cmFuc2Zvcm09Im1hdHJpeCgxLjEwMjQyNzcsMCwwLDEuMTAyNDI3NywtMzEzLjgwMDMxLC0yNDEuMzc3NTMpIj4NCiAgICAgIDxwYXRoDQogICAgICAgICBpbmtzY2FwZTpjb25uZWN0b3ItY3VydmF0dXJlPSIwIg0KICAgICAgICAgaWQ9InBhdGgyNiINCiAgICAgICAgIHN0eWxlPSJmaWxsOm5vbmUiDQogICAgICAgICBkPSJtIDI4NC42NDQ4LDQ0OS45NTYyIHYgMzguNDAwMSBoIDM4LjQwMDEgdiAtMzguNDAwMSB6IiAvPg0KICAgICAgPHBhdGgNCiAgICAgICAgIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiDQogICAgICAgICBpZD0icGF0aDI4Ig0KICAgICAgICAgc3R5bGU9ImZpbGw6Izk5OTk5OTtmaWxsLXJ1bGU6ZXZlbm9kZCINCiAgICAgICAgIGQ9Im0gMjg0LjY0NDgsNDU4LjMzNTMgaCAxMy4yMjM2IGwgNi43MTgsNi43MTc5IHYgMTkuOTI2NyBoIC0xOS45NDE2IHogbSAxMy4yMjUsMS44MTg4IDQuODk3OSw0Ljg5NzggaCAtNC44OTc5IHoiIC8+DQogICAgICA8cGF0aA0KICAgICAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCINCiAgICAgICAgIGlkPSJwYXRoMzAiDQogICAgICAgICBzdHlsZT0iZmlsbDojOTk5OTk5O2ZpbGwtcnVsZTpldmVub2RkIg0KICAgICAgICAgZD0ibSAzMTIuOTM3NCw0NTMuMzMyNiBoIDUuMDI0MiB2IDUuMDgzMiBoIDUuMDgzMyB2IDUuMDI0NCBoIC01LjA4MzMgdiA1LjA4NDUgaCAtNS4wMjQyIHYgLTUuMDg0NSBoIC01LjA4NDYgdiAtNS4wMjQ0IGggNS4wODQ2IHoiIC8+DQogICAgPC9nPg0KICA8L2c+DQo8L3N2Zz4NCg==';
 
-var css$2 = ".mad-uploader{display:flex;flex-grow:1}.mad-uploader-button input[type=file]{display:none}.mad-uploader-select-file{display:flex;flex-direction:column;align-items:flex-start;flex-grow:1}.mad-uploader-select-file input[type=file]{display:none}.mad-uploader-select-file>p{font-family:dinpro-med;margin-bottom:5px}.mad-uploader-select-file label{width:100%;cursor:pointer;border:2px dashed #b3b3b3;border-radius:5px;padding:9px 30px;margin-bottom:0;display:flex;justify-content:center;align-self:flex-start}.mad-uploader-select-file label img{width:25px;margin-left:4px}.mad-uploader-select-file label span{color:#999;font-size:16px;font-family:dinpro-med;margin-left:10px}.mad-uploader-uploaded{flex-grow:1;box-shadow:0 0 15px rgba(0,0,0,.32);border-radius:5px;padding:10px;margin-bottom:20px}.mad-uploader-uploaded-file{display:flex;flex-direction:row;align-items:center}.mad-uploader-uploaded img{width:25px}.mad-uploader-uploaded span{line-height:1.1;margin-left:10px}.mad-uploader-uploaded span:first-child{font-size:16px;font-family:dinpro-bold}.mad-uploader-uploaded span:nth-child(2){color:#b3b3b3;font-size:13px;font-family:dinpro-bold}.mad-uploader-spinner{align-self:center;margin-left:15px;padding-left:15px;padding-right:15px}.mad-uploader-download{align-self:center;margin-left:15px;padding:0 10px;border-left:1px solid #ccc}.mad-uploader-download a{text-decoration:none}.mad-uploader-remove{align-self:center;cursor:pointer;border-left:1px solid #ccc;padding:0 7px 0 16px}.mad-uploader-remove img{width:15px}.mad-uploader-load{display:flex;flex-direction:row;align-items:center;justify-content:center}.mad-uploader .f-manager,.mad-uploader .f-manager__block{width:100%}.mad-uploader .f-manager__block_item1{max-width:250px;width:100%}.mad-uploader .f-manager__block_item1 .item1-text p{max-width:200px}.sk-three-bounce{width:3.2em;margin:auto;text-align:center}.sk-three-bounce .sk-child{width:.8em;height:.8em;background-color:#666;border-radius:100%;display:inline-block;animation:sk-three-bounce 1.4s ease-in-out 0s infinite both}.sk-three-bounce .sk-bounce-1{animation-delay:-.32s;margin-left:2px}.sk-three-bounce .sk-bounce-2{animation-delay:-.16s;margin-left:2px}@keyframes sk-three-bounce{0%,80%,to{transform:scale(0)}40%{transform:scale(1)}}.eds-pass{display:flex;justify-content:center}.eds-pass .modal-content{width:440px}.eds-pass .modal-body{margin-top:0}.reg-info{margin-top:18px;padding-left:0;margin-bottom:18px}.reg-info li{margin-bottom:5px;list-style-type:none}.reg-info li .ecp-info{color:#4b4b4d;font-family:dinpro-bold}.reg-info li p{color:#999;font-size:12px;margin-bottom:0}.Toastify__toast-body ul{margin:0;padding:0}.Toastify__toast-body ul li{line-height:1.3;list-style:none;margin-top:15px}.Toastify__toast-body ul li:first-child{margin-top:0}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9pbmRleC5zY3NzIiwic3JjL3N0eWxlcy9fZm9udHMuc2NzcyIsInNyYy9zdHlsZXMvX3ZhcmlhYmxlcy5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUdBLGNBQ0UsWUFBYSxDQUNiLFdBQVksQ0FDWCxzQ0FFRyxZQUFhLENBR2pCLDBCQUNFLFlBQWEsQ0FDYixxQkFBc0IsQ0FDdEIsc0JBQXVCLENBQ3ZCLFdBQVksQ0FKYiwyQ0FNRyxZQUFhLENBTmhCLDRCQVNHLHNCQ3BCZSxDRHFCZixpQkFBa0IsQ0FWckIsZ0NBYUcsVUFBVyxDQUNYLGNBQWUsQ0FDZix5QkFBMEIsQ0FDMUIsaUJBQWtCLENBQ2xCLGdCQUFpQixDQUNqQixlQUFnQixDQUNoQixZQUFhLENBQ2Isc0JBQXVCLENBQ3ZCLHFCQUFzQixDQXJCekIsb0NBdUJLLFVBQVcsQ0FDWCxlQUFnQixDQXhCckIscUNBMkJLLFVBQWMsQ0FDZCxjQUFlLENBQ2Ysc0JDeENhLENEeUNiLGdCQUFpQixDQUl2Qix1QkFDRSxXQUFZLENBQ1osbUNFM0NrRCxDRjRDbEQsaUJBQWtCLENBQ2xCLFlBQWEsQ0FDYixrQkFBbUIsQ0FDbkIsNEJBQ0UsWUFBYSxDQUNiLGtCQUFtQixDQUNuQixrQkFBbUIsQ0FUdEIsMkJBWUcsVUFBVyxDQVpkLDRCQWVHLGVBQWdCLENBQ2hCLGdCQUFpQixDQWhCcEIsd0NBa0JLLGNBQWUsQ0FDZix1QkMvRGUsQ0Q0Q3BCLHlDQXNCSyxhQUFjLENBQ2QsY0FBZSxDQUNmLHVCQ3BFZSxDRHdFckIsc0JBQ0UsaUJBQWtCLENBQ2xCLGdCQUFpQixDQUNqQixpQkFBa0IsQ0FDbEIsa0JBQW1CLENBRXJCLHVCQUNFLGlCQUFrQixDQUNsQixnQkFBaUIsQ0FDakIsY0FBZSxDQUNmLDBCQUE4QixDQUovQix5QkFNRyxvQkFBcUIsQ0FHekIscUJBQ0UsaUJBQWtCLENBQ2xCLGNBQWUsQ0FDZiwwQkFBOEIsQ0FDOUIsb0JBQXFCLENBSnRCLHlCQU1HLFVBQVcsQ0FHZixtQkFDRSxZQUFhLENBQ2Isa0JBQW1CLENBQ25CLGtCQUFtQixDQUNuQixzQkFBdUIsQ0FsRzNCLHlEQXVHTSxVQUFXLENBdkdqQixzQ0F5R1EsZUFBZ0IsQ0FDaEIsVUFBVyxDQTFHbkIsb0RBNkdZLGVBQWdCLENBVzVCLGlCQUdFLFdBQTBCLENBQzFCLFdBQVksQ0FDWixpQkFBa0IsQ0FMcEIsMkJBUUksVUFBMEIsQ0FDMUIsV0FBMkIsQ0FDM0IscUJBWDJCLENBYTNCLGtCQUFtQixDQUNuQixvQkFBcUIsQ0FDckIsMkRBQTBFLENBZDlFLDhCQWtCSSxxQkFoQmdCLENBaUJoQixlQUFnQixDQW5CcEIsOEJBc0JJLHFCQUFtQyxDQUNuQyxlQUFnQixDQUlwQiwyQkFDRSxVQUNFLGtCQUFtQixDQUVyQixJQUNFLGtCQUFxQixDQUFBLENBR3pCLFVBQ0UsWUFBYSxDQUNiLHNCQUF1QixDQUZ6Qix5QkFJSSxXQUFZLENBSmhCLHNCQU9JLFlBQ0YsQ0FFRixVQUNFLGVBQWdCLENBQ2hCLGNBQWUsQ0FDZixrQkFBbUIsQ0FIckIsYUFNSSxpQkFBa0IsQ0FDbEIsb0JBQXFCLENBUHpCLHVCQVNNLGFBQWMsQ0FDZCx1QkNqTGlCLENEdUt2QixlQWFNLFVBQWMsQ0FDZCxjQUFlLENBQ2YsZUFBZ0IsQ0FJdEIseUJBRUksUUFBUyxDQUNULFNBQVUsQ0FIZCw0QkFLTSxlQUFnQixDQUNoQixlQUFnQixDQUNoQixlQUFnQixDQVB0Qix3Q0FVUSxZQUNGIiwiZmlsZSI6ImluZGV4LnNjc3MifQ== */";
+var css$2 = ".mad-uploader{display:flex}.mad-uploader-button input[type=file]{display:none}.mad-uploader-select-file{display:flex;flex-direction:column;align-items:flex-start;flex-grow:1}.mad-uploader-select-file input[type=file]{display:none}.mad-uploader-select-file>p{font-family:dinpro-med;margin-bottom:5px}.mad-uploader-select-file label{width:100%;cursor:pointer;border:2px dashed #b3b3b3;border-radius:5px;padding:9px 30px;margin-bottom:0;display:flex;justify-content:center;align-self:flex-start}.mad-uploader-select-file label img{width:25px;margin-left:4px}.mad-uploader-select-file label span{color:#999;font-size:16px;font-family:dinpro-med;margin-left:10px}.mad-uploader-uploaded{flex-grow:1;box-shadow:0 0 5px rgba(0,0,0,.32);border-radius:5px;padding:10px;margin-bottom:20px}.mad-uploader-uploaded-file{display:flex;flex-direction:row;align-items:center}.mad-uploader-uploaded img{width:25px}.mad-uploader-uploaded span{line-height:1.1;margin-left:10px}.mad-uploader-uploaded span:first-child{font-size:16px;font-family:dinpro-bold}.mad-uploader-uploaded span:nth-child(2){color:#b3b3b3;font-size:13px;font-family:dinpro-bold}.mad-uploader-spinner{align-self:center;margin-left:15px;padding-left:15px;padding-right:15px}.mad-uploader-download{align-self:center;margin-left:15px;padding:0 10px;border-left:1px solid #ccc}.mad-uploader-download a{text-decoration:none}.mad-uploader-remove{align-self:center;cursor:pointer;border-left:1px solid #ccc;padding:0 7px 0 16px}.mad-uploader-remove img{width:15px}.mad-uploader-load{display:flex;flex-direction:row;align-items:center;justify-content:center}.mad-uploader .f-manager,.mad-uploader .f-manager__block{width:100%}.mad-uploader .f-manager__block_item1{max-width:250px;width:100%}.mad-uploader .f-manager__block_item1 .item1-text p{max-width:200px}.sk-three-bounce{width:3.2em;margin:auto;text-align:center}.sk-three-bounce .sk-child{width:.8em;height:.8em;background-color:#666;border-radius:100%;display:inline-block;animation:sk-three-bounce 1.4s ease-in-out 0s infinite both}.sk-three-bounce .sk-bounce-1{animation-delay:-.32s;margin-left:2px}.sk-three-bounce .sk-bounce-2{animation-delay:-.16s;margin-left:2px}@keyframes sk-three-bounce{0%,80%,to{transform:scale(0)}40%{transform:scale(1)}}.eds-pass{display:flex;justify-content:center}.eds-pass .modal-content{width:440px}.eds-pass .modal-body{margin-top:0}.reg-info{margin-top:18px;padding-left:0;margin-bottom:18px}.reg-info li{margin-bottom:5px;list-style-type:none}.reg-info li .ecp-info{color:#4b4b4d;font-family:dinpro-bold}.reg-info li p{color:#999;font-size:12px;margin-bottom:0}.Toastify__toast-body ul{margin:0;padding:0}.Toastify__toast-body ul li{line-height:1.3;list-style:none;margin-top:15px}.Toastify__toast-body ul li:first-child{margin-top:0}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9pbmRleC5zY3NzIiwic3JjL3N0eWxlcy9fZm9udHMuc2NzcyIsInNyYy9zdHlsZXMvX3ZhcmlhYmxlcy5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUdBLGNBQ0UsWUFBYSxDQUVaLHNDQUVHLFlBQWEsQ0FHakIsMEJBQ0UsWUFBYSxDQUNiLHFCQUFzQixDQUN0QixzQkFBdUIsQ0FDdkIsV0FBWSxDQUpiLDJDQU1HLFlBQWEsQ0FOaEIsNEJBU0csc0JDcEJlLENEcUJmLGlCQUFrQixDQVZyQixnQ0FhRyxVQUFXLENBQ1gsY0FBZSxDQUNmLHlCQUEwQixDQUMxQixpQkFBa0IsQ0FDbEIsZ0JBQWlCLENBQ2pCLGVBQWdCLENBQ2hCLFlBQWEsQ0FDYixzQkFBdUIsQ0FDdkIscUJBQXNCLENBckJ6QixvQ0F1QkssVUFBVyxDQUNYLGVBQWdCLENBeEJyQixxQ0EyQkssVUFBYyxDQUNkLGNBQWUsQ0FDZixzQkN4Q2EsQ0R5Q2IsZ0JBQWlCLENBSXZCLHVCQUNFLFdBQVksQ0FDWixrQ0UzQ2lELENGNENqRCxpQkFBa0IsQ0FDbEIsWUFBYSxDQUNiLGtCQUFtQixDQUNuQiw0QkFDRSxZQUFhLENBQ2Isa0JBQW1CLENBQ25CLGtCQUFtQixDQVR0QiwyQkFZRyxVQUFXLENBWmQsNEJBZUcsZUFBZ0IsQ0FDaEIsZ0JBQWlCLENBaEJwQix3Q0FrQkssY0FBZSxDQUNmLHVCQy9EZSxDRDRDcEIseUNBc0JLLGFBQWMsQ0FDZCxjQUFlLENBQ2YsdUJDcEVlLENEd0VyQixzQkFDRSxpQkFBa0IsQ0FDbEIsZ0JBQWlCLENBQ2pCLGlCQUFrQixDQUNsQixrQkFBbUIsQ0FFckIsdUJBQ0UsaUJBQWtCLENBQ2xCLGdCQUFpQixDQUNqQixjQUFlLENBQ2YsMEJBQThCLENBSi9CLHlCQU1HLG9CQUFxQixDQUd6QixxQkFDRSxpQkFBa0IsQ0FDbEIsY0FBZSxDQUNmLDBCQUE4QixDQUM5QixvQkFBcUIsQ0FKdEIseUJBTUcsVUFBVyxDQUdmLG1CQUNFLFlBQWEsQ0FDYixrQkFBbUIsQ0FDbkIsa0JBQW1CLENBQ25CLHNCQUF1QixDQWxHM0IseURBdUdNLFVBQVcsQ0F2R2pCLHNDQXlHUSxlQUFnQixDQUNoQixVQUFXLENBMUduQixvREE2R1ksZUFBZ0IsQ0FXNUIsaUJBR0UsV0FBMEIsQ0FDMUIsV0FBWSxDQUNaLGlCQUFrQixDQUxwQiwyQkFRSSxVQUEwQixDQUMxQixXQUEyQixDQUMzQixxQkFYMkIsQ0FhM0Isa0JBQW1CLENBQ25CLG9CQUFxQixDQUNyQiwyREFBMEUsQ0FkOUUsOEJBa0JJLHFCQWhCZ0IsQ0FpQmhCLGVBQWdCLENBbkJwQiw4QkFzQkkscUJBQW1DLENBQ25DLGVBQWdCLENBSXBCLDJCQUNFLFVBQ0Usa0JBQW1CLENBRXJCLElBQ0Usa0JBQXFCLENBQUEsQ0FHekIsVUFDRSxZQUFhLENBQ2Isc0JBQXVCLENBRnpCLHlCQUlJLFdBQVksQ0FKaEIsc0JBT0ksWUFDRixDQUVGLFVBQ0UsZUFBZ0IsQ0FDaEIsY0FBZSxDQUNmLGtCQUFtQixDQUhyQixhQU1JLGlCQUFrQixDQUNsQixvQkFBcUIsQ0FQekIsdUJBU00sYUFBYyxDQUNkLHVCQ2pMaUIsQ0R1S3ZCLGVBYU0sVUFBYyxDQUNkLGNBQWUsQ0FDZixlQUFnQixDQUl0Qix5QkFFSSxRQUFTLENBQ1QsU0FBVSxDQUhkLDRCQUtNLGVBQWdCLENBQ2hCLGVBQWdCLENBQ2hCLGVBQWdCLENBUHRCLHdDQVVRLFlBQ0YiLCJmaWxlIjoiaW5kZXguc2NzcyJ9 */";
 styleInject(css$2);
 
 var css$3 = ".mad-logo-uploader{width:75px;height:75px;margin-right:20px}.mad-logo-uploader input[type=file]{display:none}.mad-logo-uploader label{margin-bottom:0;cursor:pointer}.mad-logo-uploader img:first-child{border-radius:50%;height:100%;width:100%;object-fit:cover}.mad-logo-uploader:hover .mad-logo-uploader__remove{display:inline-block}.mad-logo-uploader__remove{position:absolute;width:20px;height:20px;cursor:pointer}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9sb2dvLXVwbG9hZGVyL2luZGV4LnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsbUJBQ0UsVUFBVyxDQUNYLFdBQVksQ0FDWixpQkFBa0IsQ0FIcEIsb0NBTUksWUFBYSxDQU5qQix5QkFVSSxlQUFnQixDQUNoQixjQUFlLENBWG5CLG1DQWdCSSxpQkFBa0IsQ0FDbEIsV0FBWSxDQUNaLFVBQVcsQ0FDWCxnQkFBaUIsQ0FuQnJCLG9EQXVCSSxvQkFBcUIsQ0FHdkIsMkJBRUUsaUJBQWtCLENBQ2xCLFVBQVcsQ0FDWCxXQUFZLENBQ1osY0FBZSIsImZpbGUiOiJpbmRleC5zY3NzIn0= */";
@@ -797,7 +851,709 @@ var LogoUploader = function (_a) {
             React__default.createElement("img", { src: img$6, alt: "" }))));
 };
 
+var css$4 = ".loader{display:flex;flex-direction:column;align-items:center;position:absolute;left:0;bottom:0;z-index:1;width:100%;height:100%;background-color:hsla(0,0%,100%,.8);border-bottom-right-radius:10px;border-bottom-left-radius:10px}.loader:after,.loader:before{content:\"\";flex:1}.loader--eds .loader__spinner{width:100px;height:100px;background:#ffd012}.loader--modal{height:calc(100% - 81px)}.loader--modal-step{height:calc(100% - 95px)}.loader--grid-view{height:calc(100% - 38px)}.loader--goods{top:0;border-radius:10px}.loader--nav-right{top:50%;left:50%;transform:translate(-50%,-50%);background-color:#fff}.loader__content{display:flex;flex-direction:column;align-items:center}.loader__spinner{position:relative;width:140px;height:140px;margin:0;background-color:#f7f7f7;border-radius:50%}.loader--modal-step .loader__spinner,.loader--modal .loader__spinner{width:100px;height:100px;background-color:#ffd012}.loader--main .loader__spinner{background-color:#ffd012}.loader__text{margin:0;font-family:dinpro-med;text-align:center}.modal .grain-receipt{max-width:650px}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9tdWx0aXBsZS11cGxvYWRlci9tb2RhbHMvaW5kZXguc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFDQSxRQUNJLFlBQWEsQ0FDYixxQkFBc0IsQ0FDdEIsa0JBQW1CLENBRW5CLGlCQUFrQixDQUNsQixNQUFPLENBQ1AsUUFBUyxDQUNULFNBQVUsQ0FFVixVQUFXLENBQ1gsV0FBWSxDQUVaLG1DQUEwQyxDQUUxQywrQkFBZ0MsQ0FDaEMsOEJBQStCLENBaEJuQyw2QkFvQk0sVUFBVyxDQUNYLE1BQU8sQ0FFUiw4QkFFRyxXQUFZLENBQ1osWUFBYSxDQUNiLGtCQUFtQixDQUd2QixlQUNFLHdCQUF5QixDQUczQixvQkFDRSx3QkFBeUIsQ0FHM0IsbUJBQ0Usd0JBQXlCLENBRzNCLGVBQ0UsS0FBTSxDQUVOLGtCQUFtQixDQUdyQixtQkFDRSxPQUFRLENBQ1IsUUFBUyxDQUNULDhCQUFnQyxDQUNoQyxxQkFBb0MsQ0FHdEMsaUJBQ0UsWUFBYSxDQUNiLHFCQUFzQixDQUN0QixrQkFBbUIsQ0FHckIsaUJBQ0UsaUJBQWtCLENBQ2xCLFdBQVksQ0FDWixZQUFhLENBQ2IsUUFBUyxDQUVULHdCQUF5QixDQUN6QixpQkFBa0IsQ0FHcEIscUVBRUUsV0FBWSxDQUNaLFlBQWEsQ0FFYix3QkFBeUIsQ0FHM0IsK0JBQ0Usd0JBQXlCLENBVzNCLGNBQ0UsUUFBUyxDQUNULHNCQUF1QixDQUN2QixpQkFBa0IsQ0FJdEIsc0JBRUksZUFBZ0IiLCJmaWxlIjoiaW5kZXguc2NzcyJ9 */";
+styleInject(css$4);
+
 var _this$4 = undefined;
+var language$2 = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "ru";
+var SignFile$1 = function (props) {
+    var _a = React.useState(false), modal = _a[0], setModal = _a[1];
+    var _b = React.useState(false), modal2 = _b[0], setModal2 = _b[1];
+    var _c = React.useState({ value: "Qwerty12", isValid: false }), password = _c[0], setPassword = _c[1];
+    var _d = React.useState(null), p12Base64 = _d[0], setP12Base64 = _d[1];
+    React.useEffect(function () {
+        return function () {
+            setModal(false);
+        };
+    }, []);
+    /** Управление первой модалкой (данные ЭЦП) */
+    var toggle = function (e) {
+        e.preventDefault();
+        setModal(!modal);
+    };
+    /** Управление второй модалкой (пароль ЭЦП) */
+    var toggle2 = function (e) {
+        e.preventDefault();
+        setModal2(!modal2);
+    };
+    /** Обычный handler поля */
+    var handleChange = function (result, setStateCallback) {
+        var value = result.value, isValid = result.isValid;
+        setStateCallback({ value: value, isValid: isValid });
+    };
+    /** handler родителя */
+    var handleSignParent = props.handleSign;
+    /** Лучше mutation делать здесь т.к. легче хендлить loading, error непосредственно в компоненте, где она и используется  */
+    var _e = reactApollo.useMutation(SIGN_FILE, { client: client }), signFile = _e[0], sLoading = _e[1].loading;
+    var _f = React.useState(null), EDSdata = _f[0], setEDSData = _f[1];
+    var _g = reactApollo.useMutation(CHECK_EDS_DATA, { client: gatewayClient }), checkEDSData = _g[0], _h = _g[1], loading = _h.loading, error = _h.error;
+    var handleSign = function (e, fileId) { return __awaiter(_this$4, void 0, void 0, function () {
+        var file, error_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    e.preventDefault();
+                    file = null;
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, signFile({ variables: { fileId: fileId, p12Base64: p12Base64, password: password.value } })];
+                case 2:
+                    file = _a.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_1 = _a.sent();
+                    notify.notifyServer({
+                        Content: function () {
+                            return (React__default.createElement("span", null, error_1.graphQLErrors ? error_1.graphQLErrors[0].message : "Ошибка подписи, повторите попытку позже"));
+                        },
+                        type: "error"
+                    });
+                    return [3 /*break*/, 4];
+                case 4:
+                    if (file) {
+                        notify__default({
+                            header: "Файл подписан",
+                            description: "Файл успешно подписан!!!"
+                        });
+                        handleSignParent && handleSignParent(file.data.signDocument);
+                        setModal(false);
+                    }
+                    else {
+                        setEDSData(null);
+                    }
+                    return [2 /*return*/];
+            }
+        });
+    }); };
+    /**
+     * Берем содержимое файла ключа (base64) и помещаем ее в state, это много не занимает время тк. файли не весит много
+     * Потом вытаскиваем модалку с паролем
+     * @param e
+     */
+    var handleEDS = function (e) {
+        e.preventDefault();
+        var reader = new FileReader();
+        var _a = e.target, validity = _a.validity, file = _a.files[0];
+        if (validity.valid) {
+            reader.readAsDataURL(file);
+            reader.onload = function () {
+                setModal2(!modal2);
+                setP12Base64(reader.result);
+            };
+        }
+    };
+    /**
+     * У нас есть файл (base64), есть пароль - отправляем на проверку
+     * @param e
+     */
+    var handlePasswordSubmit = function (e) {
+        e.preventDefault();
+        checkEDSData({ variables: { p12Base64: p12Base64, password: password.value } })
+            .then(function (_a) {
+            var data = _a.data;
+            setEDSData(data.checkEDSData);
+            setModal2(false);
+            notify.notifyServer({ dismiss: true });
+        })
+            .catch(function (e) {
+            var errors = e.graphQLErrors[0].extensions.exception.inputErrors;
+            notify.notifyServer({
+                Content: function () {
+                    return (React__default.createElement("ul", { style: { padding: 0, margin: 0 } }, errors
+                        ? errors.map(function (error, key) { return React__default.createElement("li", { key: key }, error.message); })
+                        : "Не удалось проверить данные. Повторите позже"));
+                },
+                type: "error"
+            });
+        });
+    };
+    var RenderContent = function () {
+        var randInd = Math.floor(Math.random() * (10000 - 1)) + 1;
+        if (EDSdata) {
+            return (React__default.createElement("ul", { className: "reg-info" },
+                React__default.createElement("li", null,
+                    React__default.createElement("p", null,
+                        messages[language$2]["Owner of EDS"],
+                        ":"),
+                    React__default.createElement("p", { className: "ecp-info" }, EDSdata.owner)),
+                React__default.createElement("li", null,
+                    React__default.createElement("p", null,
+                        messages[language$2]["Authority issuing EDS"],
+                        ":"),
+                    React__default.createElement("p", { className: "ecp-info" }, EDSdata.issuer)),
+                React__default.createElement("li", null,
+                    React__default.createElement("p", null,
+                        messages[language$2]["Valid thought"],
+                        ":"),
+                    React__default.createElement("p", { className: "ecp-info" }, EDSdata.expireTime)),
+                React__default.createElement("li", null,
+                    React__default.createElement("p", null,
+                        messages[language$2]["IIN"],
+                        ":"),
+                    React__default.createElement("p", { className: "ecp-info" }, EDSdata.iin)),
+                React__default.createElement("li", null,
+                    React__default.createElement("p", null,
+                        messages[language$2]["BIN"],
+                        ":"),
+                    React__default.createElement("p", { className: "ecp-info" }, EDSdata.bin))));
+        }
+        return (React__default.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: "45px" } },
+            React__default.createElement("input", { type: "file", id: "EDS-sign-" + randInd, required: true, onChange: function (e) { return handleEDS(e); }, accept: ".p12", style: { display: "none" } }),
+            React__default.createElement("label", { htmlFor: "EDS-sign-" + randInd, className: "jbtn jbtn-fuksiya" }, messages[language$2]["Select the file with EDS"])));
+    };
+    return (React__default.createElement(React__default.Fragment, null,
+        React__default.createElement("div", { className: "sign-button" },
+            React__default.createElement("button", { className: "jbtn jbtn-wide jbtn-green", onClick: function (e) { return toggle(e); } }, messages[language$2].sign)),
+        React__default.createElement(reactstrap.Modal, { isOpen: modal, className: "prompt", centered: true, toggle: toggle, backdrop: "static" },
+            React__default.createElement(reactstrap.ModalHeader, null, "\u041F\u043E\u0434\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430"),
+            (sLoading || loading) && React__default.createElement(StdLoader$1, { type: "modal", text: "\u041F\u043E\u0434\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0444\u0430\u0439\u043B\u0430, \u043F\u043E\u0434\u043E\u0436\u0434\u0438\u0442\u0435" }),
+            React__default.createElement("form", { className: "mad-form", onSubmit: function (e) { return handleSign(e, props.fileId); } },
+                React__default.createElement(reactstrap.ModalBody, null,
+                    React__default.createElement("p", { style: { fontFamily: "dinpro-med", fontSize: "13px", lineHeight: "1.3" } }, "\u0421\u043E\u0433\u043B\u0430\u0441\u043D\u043E \u0441\u0442\u0430\u0442\u044C\u0438 24 \u0417\u0430\u043A\u043E\u043D\u0430 \u0420\u041A \u043E\u0442 7.01.2003 \u2116 370 \u00AB\u041E\u0431 \u044D\u043B\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u043E\u043C \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0435 \u0438 \u044D\u043B\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u043E\u0439 \u0446\u0438\u0444\u0440\u043E\u0432\u043E\u0439 \u043F\u043E\u0434\u043F\u0438\u0441\u0438\u00BB, \u043F\u043E\u0434\u043F\u0438\u0441\u0430\u043D\u043D\u044B\u0439 \u042D\u043B\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u044B\u0439 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442 \u0440\u0430\u0432\u043D\u043E\u0437\u043D\u0430\u0447\u0435\u043D \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0443 \u043D\u0430 \u0431\u0443\u043C\u0430\u0436\u043D\u043E\u043C \u043D\u043E\u0441\u0438\u0442\u0435\u043B\u0435."),
+                    React__default.createElement("p", { style: { fontFamily: "dinpro-med", fontSize: "13px", lineHeight: "1.3" } }, "\u0414\u043B\u044F \u043F\u043E\u0434\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u044D\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u043E\u0433\u043E \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430, \u0432\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0412\u0430\u0448 \u042D\u0426\u041F (GOST \u0438\u043B\u0438 RSA)"),
+                    React__default.createElement(RenderContent, null)),
+                React__default.createElement(reactstrap.ModalFooter, null,
+                    React__default.createElement("button", { className: "jbtn jbtn-low jbtn-cancel", onClick: function (e) { return toggle(e); } }, "\u041E\u0442\u043C\u0435\u043D\u0430"),
+                    React__default.createElement("button", { className: "jbtn jbtn-low jbtn-green", type: "submit", disabled: !EDSdata }, "\u041F\u043E\u0434\u043F\u0438\u0441\u0430\u0442\u044C")))),
+        React__default.createElement(reactstrap.Modal, { isOpen: modal2, className: "eds-pass", centered: true, backdrop: true },
+            React__default.createElement("form", { className: "mad-form", onSubmit: function (e) { return handlePasswordSubmit(e); } },
+                loading && React__default.createElement(StdLoader$1, { type: "eds" }),
+                React__default.createElement(reactstrap.ModalBody, null,
+                    React__default.createElement(InputStyleOne, { label: "\u041F\u0430\u0440\u043E\u043B\u044C \u042D\u0426\u041F", name: "password", value: password.value, enableTooltip: false, rules: ["required"], inputType: "password", handleChange: function (result) { return handleChange(result, setPassword); } })),
+                React__default.createElement(reactstrap.ModalFooter, null,
+                    React__default.createElement("button", { className: "jbtn jbtn-low jbtn-cancel", onClick: function (e) { return toggle2(e); } }, "\u041E\u0442\u043C\u0435\u043D\u0430"),
+                    React__default.createElement("button", { className: "jbtn jbtn-low jbtn-green", type: "submit", disabled: password.value == "" }, "\u041F\u043E\u0434\u0432\u0435\u0440\u0434\u0438\u0442\u044C"))))));
+};
+var StdLoader$1 = function (_a) {
+    var _b = _a.type, type = _b === void 0 ? "" : _b, text = _a.text;
+    var clazz = type ? "loader loader--" + type : "loader";
+    return (React__default.createElement("div", { className: clazz },
+        React__default.createElement("div", { className: "loader__content" },
+            React__default.createElement("p", { className: "loader__spinner" },
+                React__default.createElement("img", { src: img, style: {
+                        position: "absolute",
+                        width: "40px",
+                        left: "50%",
+                        top: "50%",
+                        transform: "translate(-50%, -50%)"
+                    }, alt: "" })),
+            text && React__default.createElement("p", { className: "loader__text" }, text))));
+};
+
+var _this$5 = undefined;
+var language$3 = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "ru";
+var StdSpinner$1 = function () {
+    return (React__default.createElement("div", { className: "mad-uploader-spinner" },
+        React__default.createElement("div", { className: "sk-three-bounce" },
+            React__default.createElement("div", { className: "sk-bounce-1 sk-child" }),
+            React__default.createElement("div", { className: "sk-bounce-2 sk-child" }),
+            React__default.createElement("div", { className: "sk-bounce-3 sk-child" }))));
+};
+var SignFileStatus$1 = function (_a) {
+    var signs = _a.signs, objType = _a.objType;
+    if (signs.length == 0) {
+        return React__default.createElement(React__default.Fragment, null);
+    }
+    return (React__default.createElement("div", { className: "f-manager__sings", style: { display: "flex", alignItems: "center", justifyContent: "flex-end", height: "46px" } },
+        React__default.createElement("span", { style: { fontSize: "13px", color: "#333333", fontFamily: "dinpro-bold" } }, objType == 101 ? "Статус зерновой расписки:" : "Подписи:"),
+        signs.map(function (sign, key) { return (React__default.createElement("div", { className: "f-manager__block_status", key: key, style: { border: "none" } },
+            React__default.createElement("img", { src: sign.signed ? img$1 : img$2, alt: "" }),
+            React__default.createElement("span", null, sign.label))); })));
+};
+var Download$1 = function (_a) {
+    var path = _a.path;
+    return (React__default.createElement("span", { className: "f-manager__block_item4" },
+        React__default.createElement("a", { href: path, target: "_blank" }, messages[language$3].download)));
+};
+var Remove$1 = function (_a) {
+    var removeDoc = _a.removeDoc;
+    return (React__default.createElement("span", { className: "f-manager__block_remove", onClick: function (e) { return removeDoc(e); } },
+        React__default.createElement("img", { src: img$4, alt: "" })));
+};
+var Viewer$1 = function (_a) {
+    var _b = _a.enableRemove, enableRemove = _b === void 0 ? false : _b, file = _a.file, _c = _a.userId, userId = _c === void 0 ? null : _c, _d = _a.handleRemove, handleRemove = _d === void 0 ? null : _d, _e = _a.ExtraContent, ExtraContent = _e === void 0 ? null : _e, _f = _a.handleSign, handleSign = _f === void 0 ? null : _f;
+    var isLoading = file ? file.loading : false;
+    var needToSign = false; //Нужно ли currentUser-у подписывать документ
+    var signed = false; // подписал ли currentUser документ
+    /** Если он есть в списке sings то ему нужно подписать дкумент */
+    file.metadata.signs.forEach(function (sign) {
+        if (userId && sign.userId == userId) {
+            needToSign = true;
+            if (sign.signed) {
+                signed = true;
+            }
+        }
+    });
+    var onRemove = function (e, fileId) { return __awaiter(_this$5, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            e.preventDefault();
+            handleRemove(fileId);
+            return [2 /*return*/];
+        });
+    }); };
+    console.log("Loading", !isLoading, file.grainReceiptData);
+    return (React__default.createElement(React__default.Fragment, null,
+        React__default.createElement("div", { className: "f-manager" },
+            React__default.createElement("div", { className: "f-manager__block" },
+                React__default.createElement("div", { className: "f-manager__block_item1" },
+                    React__default.createElement("img", { src: img$3, alt: "" }),
+                    React__default.createElement("div", { className: "item1-text" },
+                        React__default.createElement("p", { title: file.name }, file.name))),
+                React__default.createElement("div", { className: "f-manager__block_right" },
+                    !isLoading && React__default.createElement(Download$1, { path: file.path }),
+                    !isLoading && file.grainReceiptData && ExtraContent && (React__default.createElement(ExtraContent, { grainReceiptData: file.grainReceiptData })),
+                    !isLoading && enableRemove && React__default.createElement(Remove$1, { removeDoc: function (e) { return onRemove(e, file._id); } }),
+                    isLoading && React__default.createElement(StdSpinner$1, null))),
+            !isLoading && React__default.createElement(SignFileStatus$1, { signs: file.metadata.signs, objType: file.metadata.objType })),
+        needToSign && !signed && React__default.createElement(SignFile$1, { fileId: file._id, handleSign: handleSign })));
+};
+
+var DragAndDrop = function (props) {
+    var _a = React.useState(false), drag = _a[0], setDrag = _a[1];
+    var dragCounter = 0; //, setDragCounter] = useState(0)
+    var dropRef = React.useRef();
+    // const
+    React.useEffect(function () {
+        var div = dropRef.current;
+        div.addEventListener("dragenter", handleDragIn);
+        div.addEventListener("dragleave", handleDragOut);
+        div.addEventListener("dragover", handleDrag);
+        div.addEventListener("drop", handleDrop);
+        return function () {
+            var div = dropRef.current;
+            div.removeEventListener("dragenter", handleDragIn);
+            div.removeEventListener("dragleave", handleDragOut);
+            div.removeEventListener("dragover", handleDrag);
+            div.removeEventListener("drop", handleDrop);
+        };
+    }, []);
+    var handleDrag = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+    var handleDragIn = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounter++;
+        if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+            setDrag(true);
+        }
+    };
+    var handleDragOut = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounter--;
+        if (dragCounter - 1 === 0) {
+            setDrag(false);
+        }
+    };
+    var handleDrop = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        setDrag(false);
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            props.handleDrop(e);
+            e.dataTransfer.clearData();
+            dragCounter = 0;
+        }
+    };
+    return (React__default.createElement("div", { style: { display: "inline-block", width: "100%", position: "relative" }, ref: dropRef },
+        drag && (React__default.createElement("div", { style: {
+                // border: "dashed grey 4px",
+                backgroundColor: "rgba(255,255,255,.8)",
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                zIndex: 9999
+            } },
+            React__default.createElement("div", { style: {
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontFamily: "dinpro-med",
+                    color: "#666666",
+                    fontSize: "16px",
+                    height: "100%"
+                } },
+                React__default.createElement("div", null, "\u041F\u0435\u0440\u0435\u043C\u0435\u0441\u0442\u0438\u0442\u0435 \u0444\u0430\u0439\u043B \u0441\u044E\u0434\u0430")))),
+        props.children));
+};
+
+var _this$6 = undefined;
+var reducer = function (state, action) {
+    switch (action.type) {
+        case "loading": {
+            var file = action.file;
+            var fileObj = {
+                _id: action.file._id,
+                loading: true,
+                name: file.name,
+                size: filesize(file.size),
+                metadata: {
+                    signs: [],
+                    title: file.name
+                }
+            };
+            return { files: state.files.concat([fileObj]) };
+        }
+        case "uploaded": {
+            var newArr_1 = state.files.slice();
+            newArr_1.forEach(function (file, index) {
+                if (file._id == action.fileId) {
+                    newArr_1[index] = action.file;
+                }
+            });
+            return { files: newArr_1 };
+        }
+        case "remove": {
+            var newArr = state.files.slice();
+            var filter = newArr.filter(function (file) { return file._id != action.fileId; });
+            return { files: filter };
+        }
+        case "sign": {
+            var newArr_2 = state.files.slice();
+            newArr_2.forEach(function (file, index) {
+                if (file._id == action.file._id) {
+                    newArr_2[index] = action.file;
+                }
+            });
+            return { files: newArr_2 };
+        }
+        default:
+            return state;
+    }
+};
+var useUpload = function (_a) {
+    var metadata = _a.metadata, initialFiles = _a.initialFiles, maxFileSize = _a.maxFileSize, enableFakeRemove = _a.enableFakeRemove, extensions = _a.extensions;
+    var initialState = { files: initialFiles };
+    var _b = React.useReducer(reducer, initialState), state = _b[0], dispatch = _b[1];
+    var uploadMutation = reactApollo.useMutation(UPLOADFILE_LINK_MUTATION, {
+        client: client,
+        context: {
+            fetchOptions: {
+                useUpload: true,
+                // signal: abortController.signal,
+                onProgress: function (ev) {
+                    // console.log("loading...", ev.loaded * 100/ev.total + "%")
+                },
+                onAbortPossible: function (abortHandler) {
+                    // abort = abortHandler
+                }
+            }
+        }
+    })[0];
+    var _c = reactApollo.useMutation(READ_GRAIN_RECEIPT_DATA, {
+        client: gatewayClient
+    }), readGrainReceiptData = _c[0], _d = _c[1], data = _d.data, loading = _d.loading, error = _d.error;
+    var removeMutation = reactApollo.useMutation(REMOVE_LINK_MUTATION, { client: client })[0];
+    // const [signMutation] = useMutation(SIGN_FILE, { client })
+    var upload = function (event) { return __awaiter(_this$6, void 0, void 0, function () {
+        var fileList, fileListWithIds, maxFileSizeList, invalidExtensionsList, i, fileId, file;
+        var _this = this;
+        return __generator(this, function (_a) {
+            fileList = event.dataTransfer ? event.dataTransfer.files : event.target.files;
+            fileListWithIds = [];
+            maxFileSizeList = [];
+            invalidExtensionsList = [];
+            //dobavlyaem unikalny ID
+            for (i = 0; i < fileList.length; i++) {
+                fileId = Math.random()
+                    .toString(36)
+                    .substring(2, 15);
+                file = fileList.item(i);
+                if (!accepts(file, extensions)) {
+                    invalidExtensionsList.push(file);
+                    continue;
+                }
+                if (file.size > maxFileSize) {
+                    maxFileSizeList.push(file);
+                    continue; //vse, 4to proisxodit dal'we avtomatom skipitsya
+                }
+                file._id = fileId;
+                fileListWithIds.push(file);
+            }
+            (invalidExtensionsList.length || maxFileSizeList.length > 0) &&
+                notify.notifyServer({
+                    type: "error",
+                    autoClose: 600000,
+                    Content: function () {
+                        return (React__default.createElement("ul", null,
+                            maxFileSizeList.map(function (file, key) { return (React__default.createElement("li", { key: key },
+                                " ",
+                                "\u0420\u0430\u0437\u043C\u0435\u0440 \u0444\u0430\u0439\u043B\u0430 ",
+                                file.name,
+                                " \u043F\u0440\u0435\u0432\u044B\u0448\u0430\u0435\u0442\u044C \u0434\u043E\u043F\u0443\u0441\u0442\u0438\u043C\u044B\u0439 \u043B\u0438\u043C\u0438\u0442 ",
+                                filesize(maxFileSize))); }),
+                            invalidExtensionsList.map(function (file, key) { return (React__default.createElement("li", { key: key },
+                                " ",
+                                "\u0420\u0430\u0441\u0448\u0438\u0440\u0435\u043D\u0438\u0435 \u0444\u0430\u0439\u043B\u0430 ",
+                                file.name,
+                                " \u043D\u0435 \u0441\u043E\u043E\u0442\u0432\u0435\u0442\u0441\u0432\u0443\u0435\u0442 \u0442\u0440\u0435\u0431\u043E\u0432\u0430\u043D\u0438\u044F\u043C \u0444\u043E\u0440\u043C\u0430\u0442\u0430 ",
+                                extensions)); })));
+                    }
+                });
+            //zasovyvaem vse state s pometkoi loading
+            fileListWithIds.forEach(function (file) {
+                dispatch({ type: "loading", file: file });
+            });
+            //zagruzhem fayly na server... menyaem status uje zagruzhennogo fayla (loadin = false)
+            fileListWithIds.forEach(function (file) { return __awaiter(_this, void 0, void 0, function () {
+                var uploadedFile, isRead;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, uploadMutation({ variables: { file: file, metadata: metadata } })
+                            // esly my rabotaem s zernovoi raspiskoi.. togda nuzhno poluchit' dannie zr
+                        ];
+                        case 1:
+                            uploadedFile = _a.sent();
+                            if (!(metadata.objType == 101)) return [3 /*break*/, 3];
+                            return [4 /*yield*/, readGrainReceiptData({ variables: { fileId: uploadedFile.data.singleUpload._id } })];
+                        case 2:
+                            isRead = _a.sent();
+                            dispatch({ type: "uploaded", file: isRead.data.readGrainReceiptData, fileId: file._id });
+                            return [3 /*break*/, 4];
+                        case 3:
+                            dispatch({ type: "uploaded", file: uploadedFile.data.singleUpload, fileId: file._id });
+                            _a.label = 4;
+                        case 4: return [2 /*return*/];
+                    }
+                });
+            }); });
+            return [2 /*return*/];
+        });
+    }); };
+    var remove = function (fileId) { return __awaiter(_this$6, void 0, void 0, function () {
+        var isRemoved;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!!enableFakeRemove) return [3 /*break*/, 2];
+                    return [4 /*yield*/, removeMutation({ variables: { fileId: fileId } })];
+                case 1:
+                    isRemoved = _a.sent();
+                    _a.label = 2;
+                case 2:
+                    dispatch({ type: "remove", fileId: fileId });
+                    return [2 /*return*/];
+            }
+        });
+    }); };
+    var sign = function (signedFile) { return __awaiter(_this$6, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            dispatch({ type: "sign", file: signedFile });
+            return [2 /*return*/];
+        });
+    }); };
+    return {
+        files: state.files,
+        uploadFiles: upload,
+        removeFile: remove,
+        signFile: sign,
+        cancelUpload: null
+    };
+};
+
+const img$8 = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IS0tIENyZWF0ZWQgd2l0aCBJbmtzY2FwZSAoaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvKSAtLT4NCg0KPHN2Zw0KICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIg0KICAgeG1sbnM6Y2M9Imh0dHA6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL25zIyINCiAgIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyINCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciDQogICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciDQogICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiDQogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSINCiAgIHdpZHRoPSIxNjAiDQogICBoZWlnaHQ9IjE2MCINCiAgIHZpZXdCb3g9IjAgMCA0Mi4zMzMzMzIgNDIuMzMzMzM1Ig0KICAgdmVyc2lvbj0iMS4xIg0KICAgaWQ9InN2ZzgiDQogICBpbmtzY2FwZTp2ZXJzaW9uPSIwLjkyLjEgcjE1MzcxIg0KICAgc29kaXBvZGk6ZG9jbmFtZT0iYXR0ZW50LnN2ZyI+DQogIDxkZWZzDQogICAgIGlkPSJkZWZzMiIgLz4NCiAgPHNvZGlwb2RpOm5hbWVkdmlldw0KICAgICBpZD0iYmFzZSINCiAgICAgcGFnZWNvbG9yPSIjZmZmZmZmIg0KICAgICBib3JkZXJjb2xvcj0iIzY2NjY2NiINCiAgICAgYm9yZGVyb3BhY2l0eT0iMS4wIg0KICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMC4wIg0KICAgICBpbmtzY2FwZTpwYWdlc2hhZG93PSIyIg0KICAgICBpbmtzY2FwZTp6b29tPSIwLjM1Ig0KICAgICBpbmtzY2FwZTpjeD0iNDAwIg0KICAgICBpbmtzY2FwZTpjeT0iNTYwIg0KICAgICBpbmtzY2FwZTpkb2N1bWVudC11bml0cz0ibW0iDQogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9ImxheWVyMSINCiAgICAgc2hvd2dyaWQ9ImZhbHNlIg0KICAgICB1bml0cz0icHgiDQogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iOTE0Ig0KICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSI3MjAiDQogICAgIGlua3NjYXBlOndpbmRvdy14PSI1NjkiDQogICAgIGlua3NjYXBlOndpbmRvdy15PSIyOSINCiAgICAgaW5rc2NhcGU6d2luZG93LW1heGltaXplZD0iMCIgLz4NCiAgPG1ldGFkYXRhDQogICAgIGlkPSJtZXRhZGF0YTUiPg0KICAgIDxyZGY6UkRGPg0KICAgICAgPGNjOldvcmsNCiAgICAgICAgIHJkZjphYm91dD0iIj4NCiAgICAgICAgPGRjOmZvcm1hdD5pbWFnZS9zdmcreG1sPC9kYzpmb3JtYXQ+DQogICAgICAgIDxkYzp0eXBlDQogICAgICAgICAgIHJkZjpyZXNvdXJjZT0iaHR0cDovL3B1cmwub3JnL2RjL2RjbWl0eXBlL1N0aWxsSW1hZ2UiIC8+DQogICAgICAgIDxkYzp0aXRsZT48L2RjOnRpdGxlPg0KICAgICAgPC9jYzpXb3JrPg0KICAgIDwvcmRmOlJERj4NCiAgPC9tZXRhZGF0YT4NCiAgPGcNCiAgICAgaW5rc2NhcGU6bGFiZWw9IkxheWVyIDEiDQogICAgIGlua3NjYXBlOmdyb3VwbW9kZT0ibGF5ZXIiDQogICAgIGlkPSJsYXllcjEiDQogICAgIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsLTI1NC42NjY2NSkiPg0KICAgIDxnDQogICAgICAgaWQ9ImczNjk0Ig0KICAgICAgIHRyYW5zZm9ybT0ibWF0cml4KDEuMTAyNDI0OCwwLDAsMS4xMDI0MjQ4LDAsMjU0LjY2NjY1KSI+DQogICAgICA8cGF0aA0KICAgICAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCINCiAgICAgICAgIGlkPSJwYXRoMzY4MCINCiAgICAgICAgIHN0eWxlPSJmaWxsOiM4ZDE4NDM7ZmlsbC1ydWxlOmV2ZW5vZGQiDQogICAgICAgICBkPSJNIDE5LjIsMCBDIDI5LjgwNDQsMCAzOC40MDAxLDguNTk1NyAzOC40MDAxLDE5LjIgMzguNDAwMSwyOS44MDQ0IDI5LjgwNDQsMzguNDAwMSAxOS4yLDM4LjQwMDEgOC41OTU3LDM4LjQwMDEgMCwyOS44MDQ0IDAsMTkuMiAwLDguNTk1NyA4LjU5NTcsMCAxOS4yLDAgWiBNIDE2Ljg2MzIsMjMuOTczNSAxNS45NDU0LDYuOTc5NCBoIDYuNTExNiBsIC0wLjkxNzksMTYuOTk0MSBjIC0xLjU1NDIsMCAtMy4xMjE3LDAgLTQuNjc1OSwwIHogbSA0LjMwMTIsMi42OTgyIGMgLTEuMDQ0MywtMS4wNDQzIC0yLjg4MjIsLTEuMDQ0MyAtMy45MjY1LDAgLTEuMDY2NCwxLjA2NjQgLTEuMDA4OCwyLjc3OCAtMC4wNTMyLDMuODkxIDAuOTgyMiwxLjE0MTggMy4wNTA3LDEuMTM1MSA0LjAzMDcsMCAwLjk1NzgsLTEuMTE1MiAxLjAxNTQsLTIuODI0NiAtMC4wNTEsLTMuODkxIHoiIC8+DQogICAgICA8cGF0aA0KICAgICAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCINCiAgICAgICAgIGlkPSJwYXRoMzY4MiINCiAgICAgICAgIHN0eWxlPSJmaWxsOm5vbmUiDQogICAgICAgICBkPSJNIDFlLTQsMWUtNCBWIDM4LjQwMDIgSCAzOC40MDAyIFYgMWUtNCBaIiAvPg0KICAgIDwvZz4NCiAgPC9nPg0KPC9zdmc+DQo=';
+
+var GrainReceiptData = function (props) {
+    var _a = React.useState(false), modal = _a[0], setModal = _a[1];
+    var toggle = function (e) {
+        e.preventDefault();
+        setModal(!modal);
+    };
+    console.log("GRAIN RECEIPT", props);
+    var gr = props.grainReceiptData;
+    var spec = gr.specifications;
+    var cloneAndPluck = function (sourceObject, keys) {
+        var newObject = {};
+        keys.forEach(function (obj, key) {
+            newObject[obj] = sourceObject[obj];
+        });
+        return newObject;
+    };
+    var shortSpec = cloneAndPluck(spec, [
+        "class",
+        "fallingNumber",
+        "gluten",
+        "glutenCU",
+        "protein",
+        "testWeight",
+        "vitreousness",
+        "hoodness",
+        "moisture",
+        "type",
+        "grainImpurity",
+        "weedyImpurity"
+    ]);
+    return (React__default.createElement(React__default.Fragment, null,
+        React__default.createElement("span", { className: "f-manager__block_item4", style: { marginLeft: "20px", color: "#333", fontSize: "14px", cursor: "pointer", fontFamily: "dinpro-bold" }, onClick: toggle }, "\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B"),
+        React__default.createElement(reactstrap.Modal, { isOpen: modal, toggle: toggle, className: "grain-receipt", centered: true },
+            React__default.createElement(reactstrap.ModalHeader, null,
+                React__default.createElement("span", { style: { color: "#1a1a1a" } },
+                    "\u0417\u0435\u0440\u043D\u043E\u0432\u0430\u044F \u0440\u0430\u043F\u0438\u0441\u043A\u0430 ",
+                    gr.docNumber.value,
+                    " -",
+                    " ",
+                    React__default.createElement("span", { style: { color: "#1fc21f" } },
+                        " ",
+                        gr.specifications.status.value))),
+            React__default.createElement("form", { className: "mad-form", style: { fontSize: "13px" } },
+                React__default.createElement(reactstrap.ModalBody, null,
+                    React__default.createElement("div", { style: {
+                            display: "flex",
+                            flexDirection: "column",
+                            borderBottom: "1px solid #00000024",
+                            paddingBottom: "20px",
+                            marginBottom: "20px",
+                            color: "#333333"
+                        } },
+                        React__default.createElement("span", { style: { fontFamily: "dinpro-bold", lineHeight: "1.2" } }, gr.specifications.culture.value),
+                        React__default.createElement("span", { style: { fontFamily: "dinpro-bold", lineHeight: "1.2" } },
+                            gr.specifications.amount.value,
+                            " -",
+                            " ",
+                            React__default.createElement("span", { style: { fontFamily: "dinpro-med" } }, spec.cropYear.value))),
+                    React__default.createElement("div", { style: { display: "flex", borderBottom: "1px solid #00000024", marginBottom: "20px" } },
+                        React__default.createElement("ul", { style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", width: "100%", padding: "0" } }, Object.keys(shortSpec).map(function (key, index) {
+                            console.log(key);
+                            return (React__default.createElement("li", { style: {
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    fontFamily: "dinpro-bold",
+                                    marginBottom: "15px"
+                                } },
+                                React__default.createElement("span", { style: { color: "#b3b3b3", fontSize: "13px", lineHeight: "1.2" } }, shortSpec[key].label),
+                                React__default.createElement("span", { style: { color: "#4d4d4d", fontSize: "20px", lineHeight: "1.2" } }, shortSpec[key].value)));
+                        }))),
+                    React__default.createElement("div", { style: {
+                            display: "flex",
+                            flexDirection: "column",
+                            borderBottom: "1px solid #00000024",
+                            marginBottom: "20px",
+                            paddingBottom: "20px"
+                        } },
+                        React__default.createElement("span", { style: { fontFamily: "dinpro-bold", color: "#b3b3b3" } },
+                            " ",
+                            spec.smell.label,
+                            ": ",
+                            React__default.createElement("span", { style: { color: "#4d4d4d" } }, spec.smell.value)),
+                        React__default.createElement("span", { style: { fontFamily: "dinpro-bold", color: "#b3b3b3" } },
+                            " ",
+                            spec.infection.label,
+                            ": ",
+                            React__default.createElement("span", { style: { color: "#4d4d4d" } }, spec.infection.value))),
+                    React__default.createElement("div", { style: {
+                            display: "flex",
+                            flexDirection: "column",
+                            borderBottom: "1px solid #00000024",
+                            marginBottom: "20px",
+                            paddingBottom: "20px"
+                        } },
+                        React__default.createElement("span", { style: { fontFamily: "dinpro-bold", color: "#b3b3b3" } },
+                            " ",
+                            gr.ownerBIN.label,
+                            ": ",
+                            React__default.createElement("span", { style: { color: "#4d4d4d" } }, gr.ownerBIN.value)),
+                        React__default.createElement("span", { style: { fontFamily: "dinpro-bold", color: "#b3b3b3" } },
+                            " ",
+                            gr.docNumber.label,
+                            ": ",
+                            React__default.createElement("span", { style: { color: "#4d4d4d" } }, gr.docNumber.value)),
+                        React__default.createElement("span", { style: { fontFamily: "dinpro-bold", color: "#b3b3b3" } },
+                            " ",
+                            spec.GRNumber.label,
+                            ": ",
+                            React__default.createElement("span", { style: { color: "#4d4d4d" } }, spec.GRNumber.value)),
+                        React__default.createElement("span", { style: { fontFamily: "dinpro-bold", color: "#b3b3b3" } },
+                            " ",
+                            gr.docTime.label,
+                            ": ",
+                            React__default.createElement("span", { style: { color: "#4d4d4d" } }, gr.docTime.value))),
+                    React__default.createElement("div", { style: {
+                            display: "flex",
+                            flexDirection: "column",
+                            borderBottom: "1px solid #00000024",
+                            marginBottom: "20px",
+                            paddingBottom: "20px"
+                        } },
+                        React__default.createElement("span", { style: { fontFamily: "dinpro-bold", color: "#b3b3b3" } },
+                            " ",
+                            gr.elevatorBIN.label,
+                            ": ",
+                            React__default.createElement("span", { style: { color: "#4d4d4d" } }, gr.elevatorBIN.value)),
+                        React__default.createElement("span", { style: { fontFamily: "dinpro-bold", color: "#b3b3b3" } },
+                            " ",
+                            spec.category.label,
+                            ": ",
+                            React__default.createElement("span", { style: { color: "#4d4d4d" } }, spec.category.value))),
+                    React__default.createElement("div", { style: { display: "flex" } },
+                        React__default.createElement("img", { src: img$8, alt: "", style: { width: "25px", marginRight: "20px" } }),
+                        React__default.createElement("span", { style: { color: "red", fontFamily: "dinpro-med", lineHeight: "1.2", fontSize: "13px" } },
+                            React__default.createElement("span", { style: { fontFamily: "dinpro-bold" } }, "\u041F\u0440\u0438\u0447\u0438\u043D\u0430 \u043E\u0442\u043A\u043B\u043E\u043D\u0435\u043D\u0438\u044F:"),
+                            "\u0422\u044B \u0447\u0435 \u0434\u043E\u043B\u0431\u0430\u0435\u0439\u043E\u043F \u043F\u0440\u043E\u0434\u0430\u0432\u0430\u0442\u044C \u0437\u0430\u0440\u0430\u0436\u0435\u043D\u043D\u0443\u044E \u043F\u0448\u0435\u043D\u0438\u0446\u0443. \u041D\u0430\u043C \u0438 \u0442\u0430\u043A \u0442\u0443\u0442 \u0422\u0438\u0440\u0430\u043D\u0430 \u0441 T \u0432\u0438\u0440\u0443\u0441\u043E\u043C \u0445\u0432\u0430\u0442\u0430\u0435\u0442. \u0410 \u0442\u044B \u0435\u0449\u0435 \u0445\u043E\u0447\u0435\u0448 \u043F\u0440\u0438\u0442\u0430\u0440\u0430\u043D\u0438\u0442\u044C \u0441\u044E\u0434\u0430 \u042F\u0440\u0438\u043A\u043E\u0432 \u0441 LosPlagosom"))),
+                React__default.createElement(reactstrap.ModalFooter, null,
+                    React__default.createElement("button", { className: "jbtn jbtn-low jbtn-cancel" }, "\u041F\u043E\u0434\u0432\u0435\u0440\u0434\u0438\u0442\u044C"))))));
+};
+
+var MultipleUploader = function (props) {
+    var files = props.files, _a = props.allowMultiple, allowMultiple = _a === void 0 ? false : _a, _b = props.userId, userId = _b === void 0 ? null : _b, _c = props.uploadText, uploadText = _c === void 0 ? "Зерновые расписки" : _c, _d = props.extensions, extensions = _d === void 0 ? "" : _d, objId = props.objId, objType = props.objType, _e = props.objCode, objCode = _e === void 0 ? "" : _e, _f = props.maxFileSize, maxFileSize = _f === void 0 ? 1024 * 1024 * 5 : _f, needToSign = props.needToSign, _g = props.enableRemove, enableRemove = _g === void 0 ? false : _g, _h = props.enableFakeRemove, enableFakeRemove = _h === void 0 ? false : _h, _j = props.handleFiles, handleFiles = _j === void 0 ? null : _j;
+    var metadata = { objType: objType, objId: objId, objCode: objCode, needToSign: needToSign };
+    var _k = useUpload({
+        metadata: metadata,
+        initialFiles: files,
+        maxFileSize: maxFileSize,
+        enableFakeRemove: enableFakeRemove,
+        extensions: extensions
+    }), localFiles = _k.files, uploadFiles = _k.uploadFiles, removeFile = _k.removeFile, signFile = _k.signFile;
+    var _l = reactApollo.useQuery(GET_AVERAGE_GRAIN_RECEIPT_DATA, {
+        client: gatewayClient,
+        variables: { fileIds: localFiles.filter(function (file) { return !file.loading; }).map(function (file) { return file._id; }) }
+    }), data = _l.data, loading = _l.loading, error = _l.error;
+    //Передаем файлы родителю при каждом изменении
+    React.useEffect(function () {
+        handleFiles && handleFiles(localFiles);
+    }, [localFiles]);
+    /**
+     * Если allowMultiple = true... То отображаем ее всегда
+     * Если allowMultiple = false files.lengh == 1... тогда скрыть ее
+     */
+    var Uploader = function () {
+        if (allowMultiple == false && localFiles.length > 0) {
+            return React__default.createElement(React__default.Fragment, null);
+        }
+        return (React__default.createElement("div", { className: "mad-uploader-select-file" },
+            uploadText && React__default.createElement("p", null, uploadText),
+            React__default.createElement("input", { type: "file", name: "mad-file", id: "mad-file-upload-receipts", accept: extensions, key: Date.now(), multiple: true, required: true, onChange: uploadFiles }),
+            data && data.getAverageGrainReceiptData != null && !loading && (React__default.createElement(GrainReceiptData, { grainReceiptData: data.getAverageGrainReceiptData })),
+            React__default.createElement(DragAndDrop, { handleDrop: uploadFiles },
+                React__default.createElement("label", { htmlFor: "mad-file-upload-receipts" },
+                    React__default.createElement("div", { className: "mad-uploader-load" },
+                        React__default.createElement("img", { src: img$5, alt: "" }),
+                        React__default.createElement("span", null, "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0444\u0430\u0439\u043B"),
+                        extensions != "*" && (React__default.createElement("span", { style: { color: "#B3B3B3", marginLeft: "5px" } },
+                            "(",
+                            extensions,
+                            ", ",
+                            filesize(maxFileSize),
+                            ")")))))));
+    };
+    return (React__default.createElement("div", { style: { display: "flex", flexDirection: "column" } },
+        React__default.createElement(Uploader, null),
+        React__default.createElement("div", null, localFiles
+            .map(function (file, key) {
+            var ExtraContent = function (_a) {
+                var grainReceiptData = _a.grainReceiptData;
+                return React__default.createElement(GrainReceiptData, { grainReceiptData: grainReceiptData });
+            };
+            return (React__default.createElement(Viewer$1, { file: file, key: key, userId: userId, handleRemove: removeFile, enableRemove: enableRemove, handleSign: signFile, ExtraContent: metadata.objType == 101 ? ExtraContent : null }));
+        })
+            .reverse())));
+};
+
+var _this$7 = undefined;
 /**
  * @param theme Есть 2 вида загрузчика: 1. Стандарный 2. Серая кнопка
  * @param uploadText Заголовок загрузчика
@@ -833,7 +1589,7 @@ var RenderContent = function (props) {
     var handleUploadContext = React.useContext(FilesContext).handleUpload;
     var upload = function (e, _a) {
         var objId = _a.objId, objType = _a.objType;
-        return __awaiter(_this$4, void 0, void 0, function () {
+        return __awaiter(_this$7, void 0, void 0, function () {
             var file;
             return __generator(this, function (_b) {
                 switch (_b.label) {
@@ -842,7 +1598,7 @@ var RenderContent = function (props) {
                         return [4 /*yield*/, handleUploadContext(e, { objId: objId, objType: objType, objCode: objCode, needToSign: needToSign, maxFileSize: maxFileSize })];
                     case 1:
                         file = _b.sent();
-                        handleUpload && handleUpload(file);
+                        handleUpload && file && handleUpload(file);
                         return [2 /*return*/];
                 }
             });
@@ -862,13 +1618,13 @@ var RenderContent = function (props) {
             return (React__default.createElement("label", { htmlFor: "mad-file-upload-" + randInd, className: "jbtn jbtn-green mad-uploader-button" },
                 uploadText,
                 " ",
-                " ",
-                extensions != "*" && React__default.createElement("span", { style: { fontFamily: "dinpro-med" } },
-                    " (",
+                extensions != "*" && (React__default.createElement("span", { style: { fontFamily: "dinpro-med" } },
+                    " ",
+                    "(",
                     extensions,
                     ", ",
                     filesize(maxFileSize),
-                    ")"),
+                    ")")),
                 React__default.createElement("input", { type: "file", name: "mad-file", id: "mad-file-upload-" + randInd, required: true, onChange: function (e) { return upload(e, { objId: objId, objType: objType }); }, accept: extensions })));
         }
         else {
@@ -879,16 +1635,17 @@ var RenderContent = function (props) {
                     React__default.createElement("div", { className: "mad-uploader-load" },
                         React__default.createElement("img", { src: img$5, alt: "" }),
                         React__default.createElement("span", null, messages[language].chooseFile),
-                        extensions != "*" && React__default.createElement("span", { style: { color: "#B3B3B3", marginLeft: "5px" } },
+                        extensions != "*" && (React__default.createElement("span", { style: { color: "#B3B3B3", marginLeft: "5px" } },
                             "(",
                             extensions,
                             ", ",
                             filesize(maxFileSize),
-                            ")")))));
+                            ")"))))));
         }
     }
     // Файл загружен на сервер, показать FileViewer
     return (React__default.createElement(Viewer, { enableRemove: enableRemove != null ? enableRemove : true, enableFakeRemove: enableFakeRemove, handleFakeRemove: handleFakeRemove, file: fileContext, handleRemove: handleRemove, handleSign: handleSign }));
 };
 
-module.exports = FileUploader;
+exports.MultipleUploader = MultipleUploader;
+exports.default = FileUploader;

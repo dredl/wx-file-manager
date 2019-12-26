@@ -1,12 +1,13 @@
-import React, { useContext, useEffect } from "react"
-import "./file-viewer.scss"
+import React, { useEffect } from "react"
+import "../file-viewer.scss"
+
+import galka from "../../assets/galka.svg"
+import clock from "../../assets/clox.svg"
+import doc10 from "../../assets/10doc.svg"
+import cross from "../../assets/34Graycross.svg"
+import crossRed from "../../assets/cross_red.svg"
+import { messages } from "../i18n"
 import SignFile from "./modals/SignFile"
-import { FilesContext } from "./context"
-import galka from "../assets/galka.svg"
-import clock from "../assets/clox.svg"
-import doc10 from "../assets/10doc.svg"
-import cross from "../assets/34Graycross.svg"
-import { messages } from "./i18n"
 const language = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "ru"
 
 const StdSpinner = () => {
@@ -20,7 +21,7 @@ const StdSpinner = () => {
     </div>
   )
 }
-const SignFileStatus = ({ signs }) => {
+const SignFileStatus = ({ signs, objType }) => {
   if (signs.length == 0) {
     return <></>
   }
@@ -29,9 +30,9 @@ const SignFileStatus = ({ signs }) => {
       className="f-manager__sings"
       style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", height: "46px" }}
     >
-      {signs.length > 0 && (
-        <span style={{ fontSize: "13px", color: "#333333", fontFamily: "dinpro-bold" }}>Подписи:</span>
-      )}
+      <span style={{ fontSize: "13px", color: "#333333", fontFamily: "dinpro-bold" }}>
+        {objType == 101 ? "Статус зерновой расписки:" : "Подписи:"}
+      </span>
       {signs.map((sign, key) => (
         <div className="f-manager__block_status" key={key} style={{ border: "none" }}>
           <img src={sign.signed ? galka : clock} alt="" />
@@ -44,7 +45,7 @@ const SignFileStatus = ({ signs }) => {
 const Download = ({ path }) => {
   return (
     <span className="f-manager__block_item4">
-      <a href={path} download target="_blank">
+      <a href={path} target="_blank">
         {messages[language].download}
       </a>
     </span>
@@ -58,18 +59,11 @@ const Remove = ({ removeDoc }) => {
   )
 }
 
-const FakeRemove = ({ handleFakeRemove }) => {
-  return (
-    <span className="f-manager__block_remove" onClick={e => handleFakeRemove(e)}>
-      <img src={cross} alt="" />
-    </span>
-  )
-}
-
 interface IViewer {
   enableRemove?: boolean
   staticFile?: any
-  file?: any
+  file: any
+  userId: any
   handleRemove: any
   handleSign: any
   ExtraContent?: any //пока используется для того чтобы отменить сгенеренный счет
@@ -79,31 +73,19 @@ interface IViewer {
 
 const Viewer: React.FC<IViewer> = ({
   enableRemove = false,
-  file = null,
+  file,
+  userId = null,
   handleRemove = null,
-  handleSign = null,
   ExtraContent = null,
-  enableFakeRemove = false,
-  handleFakeRemove = null
+  handleSign = null
 }) => {
-  const handleRemoveContext = useContext(FilesContext).handleRemove
-  const handleFakeRemoveContext = useContext(FilesContext).handleFakeRemove
-  const fileContext = useContext(FilesContext).file
-  const isLoading = fileContext ? fileContext.loading : false
-  const userId = useContext(FilesContext).userId
-
-  useEffect(() => {
-    // console.log("File viewer mounted")
-    return () => {
-      // console.log("File viewer unmounted")
-    }
-  }, [])
+  const isLoading = file ? file.loading : false
 
   let needToSign = false //Нужно ли currentUser-у подписывать документ
   let signed = false // подписал ли currentUser документ
 
   /** Если он есть в списке sings то ему нужно подписать дкумент */
-  fileContext.metadata.signs.forEach(sign => {
+  file.metadata.signs.forEach(sign => {
     if (userId && sign.userId == userId) {
       needToSign = true
       if (sign.signed) {
@@ -111,22 +93,11 @@ const Viewer: React.FC<IViewer> = ({
       }
     }
   })
-  // /** Если userId = null то кнопка подписи отсутсвует */
-  // const SignButton = ({ signs, fileId }) => {
-
-  //   return needToSign && !signed ? <SignFile fileId={fileId} handleSign={handleSign} /> : <div />
-  // }
   const onRemove = async (e: Event, fileId: string) => {
     e.preventDefault()
-    const isRemoved = await handleRemoveContext(fileId)
-    if (isRemoved) {
-      handleRemove && handleRemove(fileId)
-    }
+    handleRemove(fileId)
   }
-  const onFakeRemove = (e: Event, fileId: string) => {
-    handleFakeRemoveContext(fileId)
-    handleFakeRemove(fileId)
-  }
+  console.log("Loading", !isLoading, file.grainReceiptData)
   return (
     <>
       <div className="f-manager">
@@ -134,20 +105,21 @@ const Viewer: React.FC<IViewer> = ({
           <div className="f-manager__block_item1">
             <img src={doc10} alt="" />
             <div className="item1-text">
-              <p title={fileContext.metadata.title}>{fileContext.metadata.title}</p>
-              <span>{fileContext.size}</span>
+              <p title={file.name}>{file.name}</p>
+              {/* <span>{file.size}</span> */}
             </div>
           </div>
 
           <div className="f-manager__block_right">
-            {!isLoading && <Download path={fileContext.path} />}
-            {!isLoading && ExtraContent && <ExtraContent />}
-            {!isLoading && enableRemove && <Remove removeDoc={e => onRemove(e, fileContext._id)} />}
-            {enableFakeRemove && <FakeRemove handleFakeRemove={e => onFakeRemove(e, fileContext._id)} />}
+            {!isLoading && <Download path={file.path} />}
+            {!isLoading && file.grainReceiptData && ExtraContent && (
+              <ExtraContent grainReceiptData={file.grainReceiptData} />
+            )}
+            {!isLoading && enableRemove && <Remove removeDoc={e => onRemove(e, file._id)} />}
             {isLoading && <StdSpinner />}
           </div>
         </div>
-        {!isLoading && <SignFileStatus signs={file.metadata.signs} />}
+        {!isLoading && <SignFileStatus signs={file.metadata.signs} objType={file.metadata.objType} />}
       </div>
       {needToSign && !signed && <SignFile fileId={file._id} handleSign={handleSign} />}
     </>

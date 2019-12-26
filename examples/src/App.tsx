@@ -2,29 +2,36 @@ import React, { useState, useContext, useEffect } from "react"
 import "./App.css"
 import FileUploader from "../../src"
 import notify, { ToastContainer } from "wx-notify"
+import FileManager from "../../src/multiple-uploader"
 const App: React.FC = () => {
-  const fakeFile = {
-    _id: "5d4154630e7f2e0bd4dc79ab",
-    createTime: 1564562410,
-    metadata: {
-      title: "Сертификаты Сертификаты Сертификаты Сертификаты Сертификаты Сертификаты",
-      objId: null,
-      objType: 101,
-      creatorId: "5cb8652b66976e8dd10c5a6a",
-      categoryId: "Need to write function",
-      signs: [
-        { userId: "5cb8652b66976e8dd10c5a6a", time: 0, signed: false, label: "Владалец" },
-        { userId: "5cb8652b66976e8dd10c5a6a", time: 0, signed: true, label: "Пидр" },
-        { userId: "5cb8652b66976e8dd10c5a6a", time: 0, signed: true, label: "Покупатель" }
-      ]
-    },
+  const fakeFile = [
+    {
+      _id: "5d4154630e7f2e0bd4dc79ab",
+      createTime: 1564562410,
+      metadata: {
+        title: "Сертификаты Сертификаты Сертификаты Сертификаты Сертификаты Сертификаты",
+        objId: null,
+        objType: 101,
+        creatorId: "5cb8652b66976e8dd10c5a6a",
+        categoryId: "Need to write function",
+        signs: [
+          { userId: "5cb8652b66976e8dd10c5a6a", time: 0, signed: false, label: "Владалец" },
+          { userId: "5cb8652b66976e8dd10c5a6a", time: 0, signed: true, label: "Считано " },
+          { userId: "5cb8652b66976e8dd10c5a6a", time: 0, signed: true, label: "Покупатель" }
+        ]
+      },
 
-    name: "a_e0be3621.jpg",
-    path: "http://85.29.134.227:4010/uploads/5d4153ea0e7f2e0bd4dc798d-a_e0be3621.jpg",
-    size: "15 KB"
-  }
+      name: "a_e0be3621.jpg a_e0be3621.jpg a_e0be3621.jpg",
+      path: "http://85.29.134.227:4010/uploads/5d4153ea0e7f2e0bd4dc798d-a_e0be3621.jpg",
+      size: "15 KB"
+    }
+  ]
   const [file, setFile] = useState(null)
   const [file2, setFile2] = useState(fakeFile)
+  const [files, setFiles] = useState([])
+  useEffect(() => {
+    // console.log("app.txx", files)
+  }, [files])
   return (
     <div className="App">
       <ToastContainer />
@@ -33,13 +40,40 @@ const App: React.FC = () => {
         <p>Hello World</p>
 
         <div className="App-panel">
+          <FileManager
+            objType={101}
+            files={[]}
+            handleFiles={files => null}
+            // maxFileSize={1024 * 1024 * 0.5}
+            enableRemove
+            needToSign
+            allowMultiple={true}
+            extensions=".pdf"
+            userId="5de28370ab07a10b197efc84"
+          />
           {/* <FileUploader
             tool="logo-manager"
             file={file}
             handleUpload={file => setFile(file)}
             handleRemove={fileId => setFile(null)}
           /> */}
-          <FileUploader
+          <br />
+          <br />
+          {/* <FileUploader
+            // uploadText="Зерновая раскписка"
+            file={file}
+            handleUpload={file => console.log(file)}
+            handleRemove={fileId => setFile(null)}
+            handleSign={file => setFile(file)}
+            objType={101}
+            objCode={"G-fkkf"}
+            tool="uploader"
+            needToSign={true}
+            // maxFileSize={1024 * 1024 * 0.5}
+            // extensions=".pdf, .png"
+            userId="5de28370ab07a10b197efc84"
+          /> */}
+          {/* <FileUploader
             // uploadText="Зерновая раскписка"
             file={file}
             handleUpload={file => setFile(file)}
@@ -52,7 +86,7 @@ const App: React.FC = () => {
             // maxFileSize={1024 * 1024 * 0.5}
             extensions=".pdf, .png"
             userId="5de28370ab07a10b197efc84"
-          />
+          /> */}
           {/* <FileUploader
             uploadText="Зерновая раскписка"
             file={file}

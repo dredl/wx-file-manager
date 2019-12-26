@@ -42,4 +42,5 @@ interface IFileUploader {
  * TODO: нужно реализовать loading у removeMutation и signMutation
  */
 declare const FileUploader: React.FC<IFileUploader>;
+export * from "./multiple-uploader";
 export default FileUploader;

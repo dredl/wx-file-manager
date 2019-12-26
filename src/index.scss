@@ -3,7 +3,7 @@
 
 .mad-uploader {
   display: flex;
-  flex-grow: 1;
+  // flex-grow: 1; poka neponyatno za4em
   &-button{
     input[type="file"] {
       display: none;
