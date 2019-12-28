@@ -2,12 +2,14 @@ import React, { useEffect } from "react"
 import "../file-viewer.scss"
 
 import galka from "../../assets/galka.svg"
+import crossRed from "../../assets/cross_red.svg"
+import cross from "../../assets/34Graycross.svg"
 import clock from "../../assets/clox.svg"
 import doc10 from "../../assets/10doc.svg"
-import cross from "../../assets/34Graycross.svg"
-import crossRed from "../../assets/cross_red.svg"
+
 import { messages } from "../i18n"
 import SignFile from "./modals/SignFile"
+const OBJ_TYPE_GRAIN_RECEIPTS = 101
 const language = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "ru"
 
 const StdSpinner = () => {
@@ -31,11 +33,11 @@ const SignFileStatus = ({ signs, objType }) => {
       style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", height: "46px" }}
     >
       <span style={{ fontSize: "13px", color: "#333333", fontFamily: "dinpro-bold" }}>
-        {objType == 101 ? "Статус зерновой расписки:" : "Подписи:"}
+        {objType == OBJ_TYPE_GRAIN_RECEIPTS ? "Статус зерновой расписки:" : "Подписи:"}
       </span>
       {signs.map((sign, key) => (
         <div className="f-manager__block_status" key={key} style={{ border: "none" }}>
-          <img src={sign.signed ? galka : clock} alt="" />
+          <img src={sign.signed ? galka : objType == OBJ_TYPE_GRAIN_RECEIPTS ? crossRed : clock} alt="" />
           <span>{sign.label}</span>
         </div>
       ))}
@@ -66,7 +68,7 @@ interface IViewer {
   userId: any
   handleRemove: any
   handleSign: any
-  ExtraContent?: any //пока используется для того чтобы отменить сгенеренный счет
+  ExtraContent: any
   enableFakeRemove?: boolean
   handleFakeRemove?: any
 }
@@ -76,7 +78,7 @@ const Viewer: React.FC<IViewer> = ({
   file,
   userId = null,
   handleRemove = null,
-  ExtraContent = null,
+  ExtraContent,
   handleSign = null
 }) => {
   const isLoading = file ? file.loading : false
@@ -97,7 +99,6 @@ const Viewer: React.FC<IViewer> = ({
     e.preventDefault()
     handleRemove(fileId)
   }
-  console.log("Loading", !isLoading, file.grainReceiptData)
   return (
     <>
       <div className="f-manager">
@@ -112,9 +113,7 @@ const Viewer: React.FC<IViewer> = ({
 
           <div className="f-manager__block_right">
             {!isLoading && <Download path={file.path} />}
-            {!isLoading && file.grainReceiptData && ExtraContent && (
-              <ExtraContent grainReceiptData={file.grainReceiptData} />
-            )}
+            {!isLoading && <ExtraContent />}
             {!isLoading && enableRemove && <Remove removeDoc={e => onRemove(e, file._id)} />}
             {isLoading && <StdSpinner />}
           </div>

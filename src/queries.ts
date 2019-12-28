@@ -34,6 +34,7 @@ export const grainReceiptsData = gql`
       vitreousness
       otherIndicators
     }
+    errors
   }
 `
 

@@ -97,8 +97,104 @@
     }
   }
 
-  .modal {
-    .grain-receipt {
-      max-width: 650px;
-    }
-  }
+  // .modal {
+  //   .grain-receipt {
+  //     max-width: 650px;
+  //     .modal-header {
+  //       // flex-direction: row;
+  //       .modal-title {
+  //         color: #1a1a1a;
+  //         flex-direction: row;
+  //         span {
+  //           color: #1fc21f;
+  //         }
+  //       }
+  //     }
+      
+  //     .modal-body {
+  //       font-size: 13px;
+  //       &__content {
+  //         display: flex;
+  //         flex-direction: column;
+  //         border-bottom: 1px solid #00000024;
+  //         padding-bottom: 20px;
+  //         margin-bottom: 20px;
+  //         color: #333333;
+  //       }
+  //       &__specifications {
+  //         display: grid;
+  //         grid-template-columns: repeat(3, 1fr);
+  //         width: 100%;
+  //         padding: 0;
+  //         margin: 0;
+  //         li {
+  //           display: flex;
+  //           flex-direction: column;
+  //           font-family: dinpro-bold;
+  //           margin-bottom: 15px;
+  //           span:first-child {
+  //             color: #b3b3b3; 
+  //             font-size: 13px; 
+  //             line-height: 1.2;
+  //           }
+  //           span:last-child {
+  //             color: #4d4d4d; 
+  //             font-size: 20px; 
+  //             line-height: 1.2;
+  //           }
+  //         }
+  //       }
+  //       &__info {
+  //         font-family: dinpro-bold;
+  //         color: #b3b3b3;
+  //         span {
+  //           color: #4d4d4d;
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
+
+  // .mad-alert {
+  //   font-size: 13px;
+  //   font-family: "dinpro-med";
+  //   line-height: 1.2;
+  //   display: flex;
+  //   align-items: center;
+    
+  //   padding: 10px;
+  //   border-radius: 10px;
+  //   &__icon {
+  //     padding: 5px 11px;
+  //     border-radius: 100px;
+  //     line-height: 1;
+  //     display: flex;
+  //     margin-right: 10px;
+  //     font-size: 20px;
+  //     font-family: "dinpro-bold";
+      
+  //   }
+  //   &__content {
+  //     display: flex;
+  //     flex-direction: column;
+  //   }
+  //   &__header {
+  //     font-family: 'dinpro-bold';
+  //   }
+  //   &--red {
+  //     background: red;
+  //     color: white;
+  //     .mad-alert__icon {
+  //       color: red;
+  //       background: white;
+  //     }
+  //   }
+  //   &--gray {
+  //     background: #cccccc;
+  //     color: #333333;
+  //     .mad-alert__icon {
+  //       color: #333333;
+  //       background: white;
+  //     }
+  //   }
+  // }

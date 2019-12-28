@@ -5,111 +5,143 @@ import Viewer from "./Viewer"
 import { DragAndDrop } from "./DragAndDrop"
 import { useUpload } from "./useUpload"
 import "../index.scss"
-import GrainReceiptData from "./modals/GrainReceiptData"
-import { useQuery } from "react-apollo"
-import { gatewayClient } from "../apollo-client-2"
-import { GET_AVERAGE_GRAIN_RECEIPT_DATA } from "../queries"
+//todo придумать как сделать так чтобы был requred либо file либо files
+// Пока не вижу смысла устанавливать wx-constants изза одной константы
+// export const OBJ_TYPE_GRAIN_RECEIPTS = 101
+// type fileOrFiles<T> = T | T[]
+// type Opts<T> = { file: fileOrFiles<T> } | { files: fileOrFiles<T> }
+
 interface IFileManager {
-  files: Array<object> | object
-  allowMultiple: boolean
-  userId: string
-  uploadText: string
-  extensions: string
-  objId: string
+  allowMultiple?: boolean
+  file?: object // если allowMultiple = false file помещяеться сюда
+  files?: Array<object> // если allowMultiple = true files помещяются сюда
+  handleFile?(file: object): void // если allowMultiple = false срабатывает он
+  handleFiles?(files: Array<object>): void // если allowMultiple = true срабатывает он
+  ExtraContent?: JSX.Element
+  ExtraContents?: Array<JSX.Element>
+  //остальные пропсы работают независимо от allowMultiple
+  theme?: string
+  userId?: string
+  uploadText?: string
+  extensions?: string
+  objId?: string
   objType: number
-  objCode: number
-  maxFileSize: number
-  needToSign: boolean
-  enableRemove: boolean
-  enableFakeRemove: boolean
-  handleFiles(files: Array<object> | object): void
+  objCode?: number
+  maxFileSize?: number
+  needToSign?: boolean
+  enableRemove?: boolean
+  enableFakeRemove?: boolean
 }
 
-const FileManager: React.FC<any> = props => {
+const FileManager: React.FC<IFileManager> = props => {
   const {
-    files,
     allowMultiple = false,
+    files,
+    file,
+    handleFile = null,
+    handleFiles = null,
+    ExtraContent = () => <></>,
+    ExtraContents = [() => <></>],
+    theme = "default",
     userId = null,
-    uploadText = "Зерновые расписки",
+    uploadText = "Загрузка файлов",
     extensions = "",
-    objId,
+    objId = "",
     objType,
     objCode = "",
-    maxFileSize = 1024 * 1024 * 5,
-    needToSign,
+    maxFileSize = 1024 * 1024 * 5, //5MB
+    needToSign = false,
     enableRemove = false,
-    enableFakeRemove = false,
-    handleFiles = null
+    enableFakeRemove = false
   } = props
 
   const metadata = { objType, objId, objCode, needToSign }
 
-  const { files: localFiles, uploadFiles, removeFile, signFile } = useUpload({
+  const { acceptedFiles, uploadFiles, removeFile, signFile } = useUpload({
+    allowMultiple,
     metadata,
-    initialFiles: files,
+    initialFiles: allowMultiple ? files : file ? [file] : [], //files или file должны использоваться толтко здесь, дальше в код им идти нельзя
     maxFileSize,
     enableFakeRemove,
     extensions
   })
-  const { data, loading, error } = useQuery(GET_AVERAGE_GRAIN_RECEIPT_DATA, {
-    client: gatewayClient,
-    variables: { fileIds: localFiles.filter(file => !file.loading).map(file => file._id) }
-  })
 
   //Передаем файлы родителю при каждом изменении
   useEffect(() => {
-    handleFiles && handleFiles(localFiles)
-  }, [localFiles])
+    handleFiles && allowMultiple && handleFiles(acceptedFiles)
+    handleFile && !allowMultiple && handleFile(acceptedFiles[0])
+  }, [acceptedFiles])
+
   /**
-   * Если allowMultiple = true... То отображаем ее всегда
-   * Если allowMultiple = false files.lengh == 1... тогда скрыть ее
+   * Загрузчик файлов
+   * Если allowMultiple = true - то отображаем ее всегда независимо от количества загруженных файлов
+   * Если allowMultiple = false files.lengh == 1 - тогда скрыть ее, показать только когда files.lengh == 0 т.е не загружен
    */
   const Uploader = () => {
-    if (allowMultiple == false && localFiles.length > 0) {
+    if (allowMultiple == false && acceptedFiles.length > 0) {
       return <></>
     }
+    const randId = Math.floor(Math.random() * (10000 - 1)) + 1
+
+    const Default = () => {
+      return (
+        <>
+          <div className="mad-uploader-select-file">
+            {uploadText && <p>{uploadText}</p>}
+            <DragAndDrop handleDrop={uploadFiles}>
+              <label htmlFor={`file-manager-${randId}`}>
+                <div className="mad-uploader-load">
+                  <img src={addFile} alt="" />
+                  <span>Выберите файл</span>
+                  {extensions != "*" && (
+                    <span style={{ color: "#B3B3B3", marginLeft: "5px" }}>
+                      ({extensions}, {filesize(maxFileSize)})
+                    </span>
+                  )}
+                </div>
+              </label>
+            </DragAndDrop>
+          </div>
+        </>
+      )
+    }
+    const Button = () => {
+      return (
+        <label htmlFor={`file-manager-${randId}`} className="jbtn jbtn-green mad-uploader-button">
+          {uploadText}
+          {extensions != "*" && (
+            <span style={{ fontFamily: "dinpro-med" }}>
+              ({extensions}, {filesize(maxFileSize)})
+            </span>
+          )}
+        </label>
+      )
+    }
     return (
-      <div className="mad-uploader-select-file">
-        {uploadText && <p>{uploadText}</p>}
+      <>
         <input
           type="file"
           name="mad-file"
-          id={"mad-file-upload-receipts"}
+          id={`file-manager-${randId}`}
           accept={extensions}
-          key={Date.now()}
-          multiple
+          style={{ display: "none" }}
+          key={randId}
+          multiple={allowMultiple}
           required
           onChange={uploadFiles}
         />
-        {data && data.getAverageGrainReceiptData != null && !loading && (
-          <GrainReceiptData grainReceiptData={data.getAverageGrainReceiptData} />
-        )}
-        <DragAndDrop handleDrop={uploadFiles}>
-          <label htmlFor={"mad-file-upload-receipts"}>
-            <div className="mad-uploader-load">
-              <img src={addFile} alt="" />
-              <span>Выберите файл</span>
-              {extensions != "*" && (
-                <span style={{ color: "#B3B3B3", marginLeft: "5px" }}>
-                  ({extensions}, {filesize(maxFileSize)})
-                </span>
-              )}
-            </div>
-          </label>
-        </DragAndDrop>
-      </div>
+        {theme == "default" && <Default />}
+        {theme == "button" && <Button />}
+      </>
     )
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
+    <div style={{ display: "flex", flexDirection: "column", width: "inherit" }}>
       <Uploader />
       <div>
-        {localFiles
+        {acceptedFiles
           .map((file, key) => {
-            const ExtraContent = ({ grainReceiptData }) => {
-              return <GrainReceiptData grainReceiptData={grainReceiptData} />
-            }
             return (
               <Viewer
                 file={file}
@@ -118,7 +150,7 @@ const FileManager: React.FC<any> = props => {
                 handleRemove={removeFile}
                 enableRemove={enableRemove}
                 handleSign={signFile}
-                ExtraContent={metadata.objType == 101 ? ExtraContent : null}
+                ExtraContent={allowMultiple ? ExtraContents[key] : ExtraContent}
               />
             )
           })

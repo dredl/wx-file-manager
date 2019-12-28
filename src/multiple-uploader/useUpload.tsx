@@ -1,11 +1,12 @@
 import React, { useReducer } from "react"
 import { UPLOADFILE_LINK_MUTATION, REMOVE_LINK_MUTATION, SIGN_FILE, READ_GRAIN_RECEIPT_DATA } from "../queries"
-import { useMutation, useQuery, useLazyQuery } from "react-apollo"
+import { useMutation } from "react-apollo"
 import { client } from "../apollo-client"
 import { gatewayClient } from "../apollo-client-2"
 import filesize from "filesize"
-import notify, { notifyServer } from "wx-notify"
+import { notifyServer } from "wx-notify"
 import accepts from "attr-accept"
+const OBJ_TYPE_GRAIN_RECEIPTS = 101
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -52,7 +53,7 @@ const reducer = (state, action) => {
   }
 }
 
-export const useUpload = ({ metadata, initialFiles, maxFileSize, enableFakeRemove, extensions }) => {
+export const useUpload = ({ metadata, initialFiles, maxFileSize, enableFakeRemove, extensions, allowMultiple }) => {
   const initialState = { files: initialFiles }
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -82,6 +83,16 @@ export const useUpload = ({ metadata, initialFiles, maxFileSize, enableFakeRemov
     const fileListWithIds = []
     const maxFileSizeList = []
     const invalidExtensionsList = []
+    if (!allowMultiple && fileList.length > 1) {
+      notifyServer({
+        Content: () => {
+          return <span>Можно загрузить только один файл!</span>
+        },
+        autoClose: 5000,
+        type: "error"
+      })
+      return
+    }
     //dobavlyaem unikalny ID
     for (var i = 0; i < fileList.length; i++) {
       const fileId = Math.random()
@@ -109,13 +120,11 @@ export const useUpload = ({ metadata, initialFiles, maxFileSize, enableFakeRemov
             <ul>
               {maxFileSizeList.map((file, key) => (
                 <li key={key}>
-                  {" "}
                   Размер файла {file.name} превышаеть допустимый лимит {filesize(maxFileSize)}
                 </li>
               ))}
               {invalidExtensionsList.map((file, key) => (
                 <li key={key}>
-                  {" "}
                   Расширение файла {file.name} не соответсвует требованиям формата {extensions}
                 </li>
               ))}
@@ -133,7 +142,7 @@ export const useUpload = ({ metadata, initialFiles, maxFileSize, enableFakeRemov
     fileListWithIds.forEach(async file => {
       const uploadedFile: any = await uploadMutation({ variables: { file, metadata } })
       // esly my rabotaem s zernovoi raspiskoi.. togda nuzhno poluchit' dannie zr
-      if (metadata.objType == 101) {
+      if (metadata.objType == OBJ_TYPE_GRAIN_RECEIPTS) {
         const isRead = await readGrainReceiptData({ variables: { fileId: uploadedFile.data.singleUpload._id } })
         dispatch({ type: "uploaded", file: isRead.data.readGrainReceiptData, fileId: file._id })
       } else {
@@ -152,7 +161,7 @@ export const useUpload = ({ metadata, initialFiles, maxFileSize, enableFakeRemov
     dispatch({ type: "sign", file: signedFile })
   }
   return {
-    files: state.files,
+    acceptedFiles: state.files,
     uploadFiles: upload,
     removeFile: remove, //remove,
     signFile: sign,

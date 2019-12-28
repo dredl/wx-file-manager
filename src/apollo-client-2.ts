@@ -19,19 +19,20 @@ const httpLink = createHttpLink({
 //   fetch: typeof window === "undefined" ? globalAny.fetch : customFetch
 // })
 
-// const authLink = setContext((_, { headers }) => {
-//   // get the authentication token from local storage if it exists
-//   const token = localStorage.getItem("loginToken")
-//   const language = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "en-US"
-//   // return the headers to the context so httpLink can read them
-//   return {
-//     headers: {
-//       ...headers,
-//       "authorization": token ? token : "", // `Bearer ${token}` : "",
-//       "accept-language": language
-//     }
-//   }
-// })
+const authLink = setContext((_, { headers }) => {
+  // get the authentication token from local storage if it exists
+  const token =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVkZTI4MzcwYWIwN2ExMGIxOTdlZmM4NCIsInVzZXJuYW1lIjoibWFkaS5zaGVyaUBnbWFpbC5jb20iLCJleHBpcmVUaW1lIjoxNTgyNDQ5MzMwLjE5NSwiaWF0IjoxNTc3MjY1MzMwfQ.yyX1oyLm5sGFbcImnG8Esz5fQPzUPYbLENCcf6Ftm68"
+  const language = "ru"
+  // return the headers to the context so httpLink can read them
+  return {
+    headers: {
+      ...headers,
+      "authorization": token ? token : "", // `Bearer ${token}` : "",
+      "accept-language": language
+    }
+  }
+})
 
 // const isObject = node => typeof node === "object" && node !== null
 // const hasFiles = (node, found = []) => {
@@ -56,7 +57,7 @@ const httpLink = createHttpLink({
 // const link2 = split(({ variables }) => hasFiles(variables), uploadLink, httpLink)
 
 export const gatewayClient = new ApolloClient({
-  link: ApolloLink.from([httpLink]), //authLink.concat(link),
+  link: ApolloLink.from([authLink, httpLink]), //authLink.concat(link),
   cache: new InMemoryCache({
     dataIdFromObject: (o: any) => {
       return o.id ? `${o.__typename}:${o.id}` : null
