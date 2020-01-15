@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from "react"
 import "./App.css"
 import FileUploader from "../../src"
 import notify, { ToastContainer } from "wx-notify"
-import FileManager from "../../src/multiple-uploader"
+import { FileManager } from "../../src/multiple-uploader"
 import { useQuery } from "react-apollo"
 import { GET_AVERAGE_GRAIN_RECEIPT_DATA } from "../../src/queries"
 import { gatewayClient } from "../../src/apollo-client-2"
@@ -59,6 +59,10 @@ const App: React.FC = () => {
     )
   }
   const [ExtraContents, setExtraContents] = useState([])
+  const handleFile = file => {
+    console.log("Handled")
+    setFile(file)
+  }
   return (
     <div className="App">
       <ToastContainer />
@@ -75,20 +79,21 @@ const App: React.FC = () => {
             />
           )}
           <FileManager
-            allowMultiple={true}
-            files={files}
-            handleFiles={files => setFiles(files)}
-            ExtraContents={ExtraContents}
+            // allowMultiple={true}
+            file={fakeFile}
+            handleFile={handleFile}
+            // ExtraContent={ExtraContents}
+            // showFilename
             // theme="button"
-            objType={101}
+            objType={102}
             // file={file2}
             // handleFile={file => setFile2(file)}
             // maxFileSize={1024 * 1024 * 0.5}
-            enableFakeRemove
+            // enableFakeRemove
             enableRemove
-            needToSign
+            // needToSign
             extensions=".pdf"
-            userId="5de28370ab07a10b197efc84"
+            // userId="5de28370ab07a10b197efc84"
           />
           {/* <FileUploader
             tool="logo-manager"

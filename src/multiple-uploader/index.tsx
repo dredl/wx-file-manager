@@ -25,15 +25,20 @@ interface IFileManager {
   uploadText?: string
   extensions?: string
   objId?: string
-  objType: number
+  objType?: number
   objCode?: number
   maxFileSize?: number
   needToSign?: boolean
   enableRemove?: boolean
   enableFakeRemove?: boolean
+  showFilename?: boolean // Отображать file.name или file.metadata.title. по умолчанию false
 }
 
-const FileManager: React.FC<IFileManager> = props => {
+/**
+ * Улучшенная версия загрузчика файлов.
+ * @param props
+ */
+export const FileManager: React.FC<IFileManager> = props => {
   const {
     allowMultiple = false,
     files,
@@ -41,18 +46,19 @@ const FileManager: React.FC<IFileManager> = props => {
     handleFile = null,
     handleFiles = null,
     ExtraContent = () => <></>,
-    ExtraContents = [() => <></>],
+    ExtraContents = [],
     theme = "default",
     userId = null,
     uploadText = "Загрузка файлов",
     extensions = "",
     objId = "",
-    objType,
+    objType = 999,
     objCode = "",
     maxFileSize = 1024 * 1024 * 5, //5MB
     needToSign = false,
     enableRemove = false,
-    enableFakeRemove = false
+    enableFakeRemove = false,
+    showFilename = false
   } = props
 
   const metadata = { objType, objId, objCode, needToSign }
@@ -60,17 +66,22 @@ const FileManager: React.FC<IFileManager> = props => {
   const { acceptedFiles, uploadFiles, removeFile, signFile } = useUpload({
     allowMultiple,
     metadata,
-    initialFiles: allowMultiple ? files : file ? [file] : [], //files или file должны использоваться толтко здесь, дальше в код им идти нельзя
+    initialFiles: allowMultiple ? files : file ? [file] : [], //files или file должны использоваться только здесь, дальше в код им идти нельзя
     maxFileSize,
     enableFakeRemove,
-    extensions
+    extensions,
+    handleFile,
+    handleFiles
   })
 
   //Передаем файлы родителю при каждом изменении
-  useEffect(() => {
-    handleFiles && allowMultiple && handleFiles(acceptedFiles)
-    handleFile && !allowMultiple && handleFile(acceptedFiles[0])
-  }, [acceptedFiles])
+  // @deprecated - пришлось эту логику отправлять в useUpload, тк handleFile должен срабатывать только тогда когда
+  // реально происходит зарузка-удаление-подписание. А по ЭТОЙ логике handleFiles будет вызываться как мин когда компонент
+  // замаунтиться
+  // useEffect(() => {
+  //   handleFiles && allowMultiple && handleFiles(acceptedFiles)
+  //   handleFile && !allowMultiple && handleFile(acceptedFiles[0])
+  // }, [acceptedFiles])
 
   /**
    * Загрузчик файлов
@@ -150,7 +161,10 @@ const FileManager: React.FC<IFileManager> = props => {
                 handleRemove={removeFile}
                 enableRemove={enableRemove}
                 handleSign={signFile}
-                ExtraContent={allowMultiple ? ExtraContents[key] : ExtraContent}
+                ExtraContent={
+                  allowMultiple ? (ExtraContents.length > 0 ? ExtraContents[key] : ExtraContent) : ExtraContent
+                }
+                showFilename={showFilename}
               />
             )
           })
@@ -159,5 +173,3 @@ const FileManager: React.FC<IFileManager> = props => {
     </div>
   )
 }
-
-export default FileManager

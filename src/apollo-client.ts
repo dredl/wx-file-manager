@@ -8,30 +8,28 @@ import { setContext } from "apollo-link-context"
 const globalAny: any = global
 const httpLink = createHttpLink({
   uri: "http://109.233.109.170:4003/graphql"
-  // uri: "http://localhost:4003/graphql" //dev only, comment before publish
 })
 
 const customFetch = (uri: any, options: any) => {
   if (options.useUpload) {
-    return uploadFetch(uri, options);
+    return uploadFetch(uri, options)
   }
-  return fetch(uri, options);
-};
+  return fetch(uri, options)
+}
 const uploadLink = createUploadLink({
   uri: "http://109.233.109.170:4003/graphql",
-  // uri: "http://localhost:4003/graphql" //dev only, comment before publish
   fetch: customFetch as any
 })
 
 const authLink = setContext((_, { headers }) => {
   // get the authentication token from local storage if it exists
-  const token = getCookie("loginToken")
+  const token = localStorage.getItem("loginToken")
   const language = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "en-US"
   // return the headers to the context so httpLink can read them
   return {
     headers: {
       ...headers,
-      "authorization": token ? token : "", // `Bearer ${token}` : "",
+      "authorization": token ? token : "",
       "accept-language": language
     }
   }
@@ -68,58 +66,55 @@ export const client = new ApolloClient({
   })
 })
 const parseHeaders = (rawHeaders: any) => {
-  const headers = new Headers();
+  const headers = new Headers()
   // Replace instances of \r\n and \n followed by at least one space or horizontal tab with a space
   // https://tools.ietf.org/html/rfc7230#section-3.2
-  const preProcessedHeaders = rawHeaders.replace(/\r?\n[\t ]+/g, " ");
+  const preProcessedHeaders = rawHeaders.replace(/\r?\n[\t ]+/g, " ")
   preProcessedHeaders.split(/\r?\n/).forEach((line: any) => {
-    const parts = line.split(":");
-    const key = parts.shift().trim();
+    const parts = line.split(":")
+    const key = parts.shift().trim()
     if (key) {
-      const value = parts.join(":").trim();
-      headers.append(key, value);
+      const value = parts.join(":").trim()
+      headers.append(key, value)
     }
-  });
-  return headers;
-};
+  })
+  return headers
+}
 export const uploadFetch = (url: string, options: any) =>
   new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest()
     xhr.onload = () => {
       const opts: any = {
         status: xhr.status,
         statusText: xhr.statusText,
         headers: parseHeaders(xhr.getAllResponseHeaders() || "")
-      };
-      opts.url =
-        "responseURL" in xhr
-          ? xhr.responseURL
-          : opts.headers.get("X-Request-URL");
-      const body = "response" in xhr ? xhr.response : (xhr as any).responseText;
-      resolve(new Response(body, opts));
-    };
+      }
+      opts.url = "responseURL" in xhr ? xhr.responseURL : opts.headers.get("X-Request-URL")
+      const body = "response" in xhr ? xhr.response : (xhr as any).responseText
+      resolve(new Response(body, opts))
+    }
     xhr.onerror = () => {
-      reject(new TypeError("Network request failed"));
-    };
+      reject(new TypeError("Network request failed"))
+    }
     xhr.ontimeout = () => {
-      reject(new TypeError("Network request failed"));
-    };
-    xhr.open(options.method, url, true);
+      reject(new TypeError("Network request failed"))
+    }
+    xhr.open(options.method, url, true)
 
     Object.keys(options.headers).forEach(key => {
-      xhr.setRequestHeader(key, options.headers[key]);
-    });
+      xhr.setRequestHeader(key, options.headers[key])
+    })
 
     if (xhr.upload) {
-      xhr.upload.onprogress = options.onProgress;
+      xhr.upload.onprogress = options.onProgress
     }
 
     options.onAbortPossible(() => {
-      xhr.abort();
-    });
+      xhr.abort()
+    })
 
-    xhr.send(options.body);
-  });
+    xhr.send(options.body)
+  })
 
 function getCookie(cname) {
   var name = cname + "="

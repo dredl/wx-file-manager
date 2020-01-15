@@ -53,7 +53,16 @@ const reducer = (state, action) => {
   }
 }
 
-export const useUpload = ({ metadata, initialFiles, maxFileSize, enableFakeRemove, extensions, allowMultiple }) => {
+export const useUpload = ({
+  metadata,
+  initialFiles,
+  maxFileSize,
+  enableFakeRemove,
+  extensions,
+  allowMultiple,
+  handleFile = null,
+  handleFiles = null
+}) => {
   const initialState = { files: initialFiles }
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -148,6 +157,8 @@ export const useUpload = ({ metadata, initialFiles, maxFileSize, enableFakeRemov
       } else {
         dispatch({ type: "uploaded", file: uploadedFile.data.singleUpload, fileId: file._id })
       }
+      handleFiles && allowMultiple && handleFiles(state.files)
+      handleFile && !allowMultiple && handleFile(state.files[0])
     })
   }
   const remove = async fileId => {
@@ -155,10 +166,14 @@ export const useUpload = ({ metadata, initialFiles, maxFileSize, enableFakeRemov
       const isRemoved = await removeMutation({ variables: { fileId } })
     }
     dispatch({ type: "remove", fileId })
+    handleFiles && allowMultiple && handleFiles(state.files)
+    handleFile && !allowMultiple && handleFile(state.files[0])
   }
 
   const sign = async signedFile => {
     dispatch({ type: "sign", file: signedFile })
+    handleFiles && allowMultiple && handleFiles(state.files)
+    handleFile && !allowMultiple && handleFile(state.files[0])
   }
   return {
     acceptedFiles: state.files,

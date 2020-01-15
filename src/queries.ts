@@ -4,6 +4,7 @@ export const grainReceiptsData = gql`
     docNumber
     docTime
     ownerBIN
+    elevator
     elevatorBIN
     specifications {
       status

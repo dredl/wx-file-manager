@@ -7,9 +7,10 @@ interface IViewer {
     userId: any;
     handleRemove: any;
     handleSign: any;
-    ExtraContent?: any;
+    ExtraContent: any;
     enableFakeRemove?: boolean;
     handleFakeRemove?: any;
+    showFilename: boolean;
 }
 declare const Viewer: React.FC<IViewer>;
 export default Viewer;

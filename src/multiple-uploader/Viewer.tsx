@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import "../file-viewer.scss"
 
 import galka from "../../assets/galka.svg"
@@ -28,17 +28,16 @@ const SignFileStatus = ({ signs, objType }) => {
     return <></>
   }
   return (
-    <div
-      className="f-manager__sings"
-      style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", height: "46px" }}
-    >
-      <span style={{ fontSize: "13px", color: "#333333", fontFamily: "dinpro-bold" }}>
+    <div className="f-manager__signs">
+      <span className="f-manager__signs_label">
         {objType == OBJ_TYPE_GRAIN_RECEIPTS ? "Статус зерновой расписки:" : "Подписи:"}
       </span>
       {signs.map((sign, key) => (
-        <div className="f-manager__block_status" key={key} style={{ border: "none" }}>
+        <div className="f-manager__block_status" key={key}>
           <img src={sign.signed ? galka : objType == OBJ_TYPE_GRAIN_RECEIPTS ? crossRed : clock} alt="" />
-          <span>{sign.label}</span>
+          <span className={!sign.signed && objType == OBJ_TYPE_GRAIN_RECEIPTS ? "f-manager__block_status_error" : ""}>
+            {sign.label}
+          </span>
         </div>
       ))}
     </div>
@@ -71,6 +70,7 @@ interface IViewer {
   ExtraContent: any
   enableFakeRemove?: boolean
   handleFakeRemove?: any
+  showFilename: boolean
 }
 
 const Viewer: React.FC<IViewer> = ({
@@ -79,7 +79,8 @@ const Viewer: React.FC<IViewer> = ({
   userId = null,
   handleRemove = null,
   ExtraContent,
-  handleSign = null
+  handleSign = null,
+  showFilename
 }) => {
   const isLoading = file ? file.loading : false
 
@@ -106,7 +107,9 @@ const Viewer: React.FC<IViewer> = ({
           <div className="f-manager__block_item1">
             <img src={doc10} alt="" />
             <div className="item1-text">
-              <p title={file.name}>{file.name}</p>
+              <p title={showFilename ? file.name : file.metadata.title}>
+                {showFilename ? file.name : file.metadata.title}
+              </p>
               {/* <span>{file.size}</span> */}
             </div>
           </div>
