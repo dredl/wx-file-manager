@@ -110,13 +110,12 @@ const Viewer: React.FC<IViewer> = ({
               <p title={showFilename ? file.name : file.metadata.title}>
                 {showFilename ? file.name : file.metadata.title}
               </p>
-              {/* <span>{file.size}</span> */}
             </div>
           </div>
 
           <div className="f-manager__block_right">
             {!isLoading && <Download path={file.path} />}
-            {!isLoading && <ExtraContent />}
+            {!isLoading && ExtraContent && <ExtraContent />}
             {!isLoading && enableRemove && <Remove removeDoc={e => onRemove(e, file._id)} />}
             {isLoading && <StdSpinner />}
           </div>

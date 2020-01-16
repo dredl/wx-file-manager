@@ -47,7 +47,6 @@ const App: React.FC = () => {
       }
       ExtraContents.push(ExtraContent)
     })
-
     setExtraContents(ExtraContents)
   }, [files])
 
@@ -59,8 +58,9 @@ const App: React.FC = () => {
     )
   }
   const [ExtraContents, setExtraContents] = useState([])
+
   const handleFile = file => {
-    console.log("Handled")
+    // console.log("Handled", file)
     setFile(file)
   }
   return (
@@ -79,21 +79,21 @@ const App: React.FC = () => {
             />
           )}
           <FileManager
-            // allowMultiple={true}
-            file={fakeFile}
-            handleFile={handleFile}
-            // ExtraContent={ExtraContents}
+            allowMultiple={true}
+            files={files}
+            handleFiles={files => setFiles(files)}
+            ExtraContents={ExtraContents}
             // showFilename
             // theme="button"
-            objType={102}
+            objType={101}
             // file={file2}
             // handleFile={file => setFile2(file)}
             // maxFileSize={1024 * 1024 * 0.5}
             // enableFakeRemove
             enableRemove
-            // needToSign
+            needToSign
             extensions=".pdf"
-            // userId="5de28370ab07a10b197efc84"
+            userId="5d5a417bdd009a2d9f39f9c4"
           />
           {/* <FileUploader
             tool="logo-manager"

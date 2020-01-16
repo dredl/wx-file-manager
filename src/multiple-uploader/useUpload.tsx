@@ -1,4 +1,4 @@
-import React, { useReducer } from "react"
+import React, { useReducer, useEffect, useCallback } from "react"
 import { UPLOADFILE_LINK_MUTATION, REMOVE_LINK_MUTATION, SIGN_FILE, READ_GRAIN_RECEIPT_DATA } from "../queries"
 import { useMutation } from "react-apollo"
 import { client } from "../apollo-client"
@@ -9,6 +9,7 @@ import accepts from "attr-accept"
 const OBJ_TYPE_GRAIN_RECEIPTS = 101
 
 const reducer = (state, action) => {
+  console.log("called twice?", state, action)
   switch (action.type) {
     case "loading": {
       const file = action.file
@@ -31,11 +32,13 @@ const reducer = (state, action) => {
           newArr[index] = action.file
         }
       })
+      action.handleFileActions(newArr)
       return { files: newArr }
     }
     case "remove": {
       const newArr = [...state.files]
       const filter = newArr.filter(file => file._id != action.fileId)
+      action.handleFileActions(filter)
       return { files: filter }
     }
     case "sign": {
@@ -87,6 +90,10 @@ export const useUpload = ({
   const [removeMutation] = useMutation(REMOVE_LINK_MUTATION, { client })
   // const [signMutation] = useMutation(SIGN_FILE, { client })
 
+  const handleFileActions = useCallback(files => {
+    handleFiles && allowMultiple && handleFiles(files)
+    handleFile && !allowMultiple && handleFile(files[0])
+  }, [])
   const upload = async event => {
     const fileList = event.dataTransfer ? event.dataTransfer.files : event.target.files
     const fileListWithIds = []
@@ -153,27 +160,40 @@ export const useUpload = ({
       // esly my rabotaem s zernovoi raspiskoi.. togda nuzhno poluchit' dannie zr
       if (metadata.objType == OBJ_TYPE_GRAIN_RECEIPTS) {
         const isRead = await readGrainReceiptData({ variables: { fileId: uploadedFile.data.singleUpload._id } })
-        dispatch({ type: "uploaded", file: isRead.data.readGrainReceiptData, fileId: file._id })
+        dispatch({
+          type: "uploaded",
+          file: isRead.data.readGrainReceiptData,
+          fileId: file._id,
+          handleFileActions
+        })
       } else {
-        dispatch({ type: "uploaded", file: uploadedFile.data.singleUpload, fileId: file._id })
+        dispatch({
+          type: "uploaded",
+          file: uploadedFile.data.singleUpload,
+          fileId: file._id,
+          handleFileActions
+        })
       }
-      handleFiles && allowMultiple && handleFiles(state.files)
-      handleFile && !allowMultiple && handleFile(state.files[0])
     })
   }
   const remove = async fileId => {
     if (!enableFakeRemove) {
       const isRemoved = await removeMutation({ variables: { fileId } })
     }
-    dispatch({ type: "remove", fileId })
-    handleFiles && allowMultiple && handleFiles(state.files)
-    handleFile && !allowMultiple && handleFile(state.files[0])
+    dispatch({ type: "remove", fileId, handleFileActions })
   }
 
   const sign = async signedFile => {
+    //Сделано по костыльски, тк. передавая и запуская функцию handleFileActions внутри reducer-a приводит
+    //к тому что dispatch срабатывает дважды, следовательно и сама функция что очен критично
     dispatch({ type: "sign", file: signedFile })
-    handleFiles && allowMultiple && handleFiles(state.files)
-    handleFile && !allowMultiple && handleFile(state.files[0])
+    const newArr = [...state.files]
+    newArr.forEach((file, index) => {
+      if (file._id == signedFile._id) {
+        newArr[index] = signedFile
+      }
+    })
+    handleFileActions(newArr)
   }
   return {
     acceptedFiles: state.files,

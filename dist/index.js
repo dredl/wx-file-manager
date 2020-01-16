@@ -1039,7 +1039,7 @@ var Viewer$1 = function (_a) {
                         React__default.createElement("p", { title: showFilename ? file.name : file.metadata.title }, showFilename ? file.name : file.metadata.title))),
                 React__default.createElement("div", { className: "f-manager__block_right" },
                     !isLoading && React__default.createElement(Download$1, { path: file.path }),
-                    !isLoading && React__default.createElement(ExtraContent, null),
+                    !isLoading && ExtraContent && React__default.createElement(ExtraContent, null),
                     !isLoading && enableRemove && React__default.createElement(Remove$1, { removeDoc: function (e) { return onRemove(e, file._id); } }),
                     isLoading && React__default.createElement(StdSpinner$1, null))),
             !isLoading && React__default.createElement(SignFileStatus$1, { signs: file.metadata.signs, objType: file.metadata.objType })),
@@ -1122,6 +1122,7 @@ var DragAndDrop = function (props) {
 var _this$6 = undefined;
 var OBJ_TYPE_GRAIN_RECEIPTS$1 = 101;
 var reducer = function (state, action) {
+    console.log("called twice?", state, action);
     switch (action.type) {
         case "loading": {
             var file = action.file;
@@ -1144,11 +1145,13 @@ var reducer = function (state, action) {
                     newArr_1[index] = action.file;
                 }
             });
+            action.handleFileActions(newArr_1);
             return { files: newArr_1 };
         }
         case "remove": {
             var newArr = state.files.slice();
             var filter = newArr.filter(function (file) { return file._id != action.fileId; });
+            action.handleFileActions(filter);
             return { files: filter };
         }
         case "sign": {
@@ -1165,9 +1168,9 @@ var reducer = function (state, action) {
     }
 };
 var useUpload = function (_a) {
-    var metadata = _a.metadata, initialFiles = _a.initialFiles, maxFileSize = _a.maxFileSize, enableFakeRemove = _a.enableFakeRemove, extensions = _a.extensions, allowMultiple = _a.allowMultiple;
+    var metadata = _a.metadata, initialFiles = _a.initialFiles, maxFileSize = _a.maxFileSize, enableFakeRemove = _a.enableFakeRemove, extensions = _a.extensions, allowMultiple = _a.allowMultiple, _b = _a.handleFile, handleFile = _b === void 0 ? null : _b, _c = _a.handleFiles, handleFiles = _c === void 0 ? null : _c;
     var initialState = { files: initialFiles };
-    var _b = React.useReducer(reducer, initialState), state = _b[0], dispatch = _b[1];
+    var _d = React.useReducer(reducer, initialState), state = _d[0], dispatch = _d[1];
     var uploadMutation = reactApollo.useMutation(UPLOADFILE_LINK_MUTATION, {
         client: client,
         context: {
@@ -1183,11 +1186,15 @@ var useUpload = function (_a) {
             }
         }
     })[0];
-    var _c = reactApollo.useMutation(READ_GRAIN_RECEIPT_DATA, {
+    var _e = reactApollo.useMutation(READ_GRAIN_RECEIPT_DATA, {
         client: gatewayClient
-    }), readGrainReceiptData = _c[0], _d = _c[1], data = _d.data, loading = _d.loading, error = _d.error;
+    }), readGrainReceiptData = _e[0], _f = _e[1], data = _f.data, loading = _f.loading, error = _f.error;
     var removeMutation = reactApollo.useMutation(REMOVE_LINK_MUTATION, { client: client })[0];
     // const [signMutation] = useMutation(SIGN_FILE, { client })
+    var handleFileActions = React.useCallback(function (files) {
+        handleFiles && allowMultiple && handleFiles(files);
+        handleFile && !allowMultiple && handleFile(files[0]);
+    }, []);
     var upload = function (event) { return __awaiter(_this$6, void 0, void 0, function () {
         var fileList, fileListWithIds, maxFileSizeList, invalidExtensionsList, i, fileId, file;
         var _this = this;
@@ -1259,10 +1266,20 @@ var useUpload = function (_a) {
                             return [4 /*yield*/, readGrainReceiptData({ variables: { fileId: uploadedFile.data.singleUpload._id } })];
                         case 2:
                             isRead = _a.sent();
-                            dispatch({ type: "uploaded", file: isRead.data.readGrainReceiptData, fileId: file._id });
+                            dispatch({
+                                type: "uploaded",
+                                file: isRead.data.readGrainReceiptData,
+                                fileId: file._id,
+                                handleFileActions: handleFileActions
+                            });
                             return [3 /*break*/, 4];
                         case 3:
-                            dispatch({ type: "uploaded", file: uploadedFile.data.singleUpload, fileId: file._id });
+                            dispatch({
+                                type: "uploaded",
+                                file: uploadedFile.data.singleUpload,
+                                fileId: file._id,
+                                handleFileActions: handleFileActions
+                            });
                             _a.label = 4;
                         case 4: return [2 /*return*/];
                     }
@@ -1282,14 +1299,24 @@ var useUpload = function (_a) {
                     isRemoved = _a.sent();
                     _a.label = 2;
                 case 2:
-                    dispatch({ type: "remove", fileId: fileId });
+                    dispatch({ type: "remove", fileId: fileId, handleFileActions: handleFileActions });
                     return [2 /*return*/];
             }
         });
     }); };
     var sign = function (signedFile) { return __awaiter(_this$6, void 0, void 0, function () {
+        var newArr;
         return __generator(this, function (_a) {
+            //Сделано по костыльски, тк. передавая и запуская функцию handleFileActions внутри reducer-a приводит
+            //к тому что dispatch срабатывает дважды, следовательно и сама функция что очен критично
             dispatch({ type: "sign", file: signedFile });
+            newArr = state.files.slice();
+            newArr.forEach(function (file, index) {
+                if (file._id == signedFile._id) {
+                    newArr[index] = signedFile;
+                }
+            });
+            handleFileActions(newArr);
             return [2 /*return*/];
         });
     }); };
@@ -1317,13 +1344,18 @@ var FileManager = function (props) {
         initialFiles: allowMultiple ? files : file ? [file] : [],
         maxFileSize: maxFileSize,
         enableFakeRemove: enableFakeRemove,
-        extensions: extensions
+        extensions: extensions,
+        handleFile: handleFile,
+        handleFiles: handleFiles
     }), acceptedFiles = _t.acceptedFiles, uploadFiles = _t.uploadFiles, removeFile = _t.removeFile, signFile = _t.signFile;
     //Передаем файлы родителю при каждом изменении
-    React.useEffect(function () {
-        handleFiles && allowMultiple && handleFiles(acceptedFiles);
-        handleFile && !allowMultiple && handleFile(acceptedFiles[0]);
-    }, [acceptedFiles]);
+    // @deprecated - пришлось эту логику отправлять в useUpload, тк handleFile должен срабатывать только тогда когда
+    // реально происходит зарузка-удаление-подписание. А по ЭТОЙ логике handleFiles будет вызываться как мин когда компонент
+    // замаунтиться
+    // useEffect(() => {
+    //   handleFiles && allowMultiple && handleFiles(acceptedFiles)
+    //   handleFile && !allowMultiple && handleFile(acceptedFiles[0])
+    // }, [acceptedFiles])
     /**
      * Загрузчик файлов
      * Если allowMultiple = true - то отображаем ее всегда независимо от количества загруженных файлов
