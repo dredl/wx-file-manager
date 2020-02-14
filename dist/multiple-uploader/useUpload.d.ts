@@ -11,6 +11,7 @@ export declare const useUpload: ({ metadata, initialFiles, maxFileSize, enableFa
     acceptedFiles: any;
     uploadFiles: (event: any) => Promise<void>;
     removeFile: (fileId: any) => Promise<void>;
+    moderateFile: (fileId: any, status: any) => Promise<void>;
     signFile: (signedFile: any) => Promise<void>;
     cancelUpload: any;
 };

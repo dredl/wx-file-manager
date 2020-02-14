@@ -18,6 +18,7 @@ interface IFileManager {
     maxFileSize?: number;
     needToSign?: boolean;
     enableRemove?: boolean;
+    enableDisable?: boolean;
     enableFakeRemove?: boolean;
     showFilename?: boolean;
 }

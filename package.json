@@ -1,6 +1,6 @@
 {
   "name": "wx-file-manager",
-  "version": "1.4.17",
+  "version": "1.4.20",
   "description": "File Uploader Specially created for Wexport.com project",
   "main": "dist/index.js",
   "files": [
@@ -82,7 +82,8 @@
     "wx-notify": "^1.2.1"
   },
   "dependencies": {
-    "attr-accept": "^2.0.0"
+    "attr-accept": "^2.0.0",
+    "js-cookie": "^2.2.1"
   },
   "peerDependencies": {
     "@types/react": "^16.8.22",

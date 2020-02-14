@@ -30,8 +30,10 @@ interface IFileManager {
   maxFileSize?: number
   needToSign?: boolean
   enableRemove?: boolean
+  enableDisable?: boolean
   enableFakeRemove?: boolean
   showFilename?: boolean // Отображать file.name или file.metadata.title. по умолчанию false
+  showFileStatus?: boolean // Отображать ли статус файла. 0 - отклонен, 1 на модерации 2 проверен
 }
 
 /**
@@ -57,13 +59,15 @@ export const FileManager: React.FC<IFileManager> = props => {
     maxFileSize = 1024 * 1024 * 5, //5MB
     needToSign = false,
     enableRemove = false,
+    enableDisable = false,
     enableFakeRemove = false,
-    showFilename = false
+    showFilename = false,
+    showFileStatus = false
   } = props
 
   const metadata = { objType, objId, objCode, needToSign }
 
-  const { acceptedFiles, uploadFiles, removeFile, signFile } = useUpload({
+  const { acceptedFiles, uploadFiles, removeFile, moderateFile, signFile } = useUpload({
     allowMultiple,
     metadata,
     initialFiles: allowMultiple ? files : file ? [file] : [], //files или file должны использоваться только здесь, дальше в код им идти нельзя
@@ -159,12 +163,15 @@ export const FileManager: React.FC<IFileManager> = props => {
                 key={key}
                 userId={userId}
                 handleRemove={removeFile}
+                handleModerate={moderateFile}
                 enableRemove={enableRemove}
+                enableModerate={enableDisable}
                 handleSign={signFile}
                 ExtraContent={
                   allowMultiple ? (ExtraContents.length > 0 ? ExtraContents[key] : ExtraContent) : ExtraContent
                 }
                 showFilename={showFilename}
+                showFileStatus={showFileStatus}
               />
             )
           })

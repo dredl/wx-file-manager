@@ -2,6 +2,7 @@ export const messages = {
   en: {
     "chooseFile": "Choose File",
     "download": "View",
+    "moderate": "Moderate",
     "sign": "Sign",
     "Select the file with EDS": "Select EDS file (GOST)",
     "EDS": "EDS",
@@ -14,6 +15,7 @@ export const messages = {
   ru: {
     "chooseFile": "Выберите файл",
     "download": "Просмотреть",
+    "moderate": "Модерация",
     "sign": "Подписать",
     "Select the file with EDS": "Выберите файл ЭЦП (GOST)",
     "EDS": "ЭЦП",
@@ -27,6 +29,7 @@ export const messages = {
   kk: {
     "chooseFile": "Файлды тандаңыз",
     "download": "Карау",
+    "moderate": "Модерация",
     "sign": "Қол қою",
     "Select the file with EDS": "ЭЦҚ файлын таңданыз (GOST)",
     "EDS": "ЭЦҚ",

@@ -4,11 +4,9 @@ import { InMemoryCache } from "apollo-cache-inmemory"
 import { ApolloLink, split } from "apollo-link"
 import { createUploadLink } from "apollo-upload-client"
 import { setContext } from "apollo-link-context"
-//@ts-ignore
-const globalAny: any = global
-const httpLink = createHttpLink({
-  uri: "http://109.233.109.170:4003/graphql"
-})
+import Cookies from "js-cookie"
+
+const httpLink = uri => createHttpLink({ uri })
 
 const customFetch = (uri: any, options: any) => {
   if (options.useUpload) {
@@ -16,14 +14,11 @@ const customFetch = (uri: any, options: any) => {
   }
   return fetch(uri, options)
 }
-const uploadLink = createUploadLink({
-  uri: "http://109.233.109.170:4003/graphql",
-  fetch: customFetch as any
-})
+const uploadLink = uri => createUploadLink({ uri, fetch: customFetch })
 
 const authLink = setContext((_, { headers }) => {
   // get the authentication token from local storage if it exists
-  const token = localStorage.getItem("loginToken")
+  const token = Cookies.get("loginToken")
   const language = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "en-US"
   // return the headers to the context so httpLink can read them
   return {
@@ -55,16 +50,17 @@ const hasFiles = (node, found = []) => {
 
   return found.length > 0
 }
-const link2 = split(({ variables }) => hasFiles(variables), uploadLink, httpLink)
+const link2 = uri => split(({ variables }) => hasFiles(variables), uploadLink(uri), httpLink(uri))
 
-export const client = new ApolloClient({
-  link: ApolloLink.from([authLink, link2]), //authLink.concat(link),
-  cache: new InMemoryCache({
-    dataIdFromObject: (o: any) => {
-      return o.id ? `${o.__typename}:${o.id}` : null
-    }
+export const client = uri =>
+  new ApolloClient({
+    link: ApolloLink.from([authLink, link2(uri)]), //authLink.concat(link),
+    cache: new InMemoryCache({
+      dataIdFromObject: (o: any) => {
+        return o.id ? `${o.__typename}:${o.id}` : null
+      }
+    })
   })
-})
 const parseHeaders = (rawHeaders: any) => {
   const headers = new Headers()
   // Replace instances of \r\n and \n followed by at least one space or horizontal tab with a space

@@ -5,7 +5,7 @@ import { ApolloLink, split } from "apollo-link"
 import { setContext } from "apollo-link-context"
 import Cookies from "js-cookie"
 
-const httpLink = createHttpLink({ uri: "http://192.168.0.106:4000/graphql" })
+const httpLink = uri => createHttpLink({ uri })
 
 const authLink = setContext((_, { headers }) => {
   // get the authentication token from local storage if it exists
@@ -21,11 +21,12 @@ const authLink = setContext((_, { headers }) => {
   }
 })
 
-export const gatewayClient = new ApolloClient({
-  link: ApolloLink.from([authLink, httpLink]),
-  cache: new InMemoryCache({
-    dataIdFromObject: (o: any) => {
-      return o.id ? `${o.__typename}:${o.id}` : null
-    }
+export const gatewayClient = uri =>
+  new ApolloClient({
+    link: ApolloLink.from([authLink, httpLink(uri)]),
+    cache: new InMemoryCache({
+      dataIdFromObject: (o: any) => {
+        return o.id ? `${o.__typename}:${o.id}` : null
+      }
+    })
   })
-})

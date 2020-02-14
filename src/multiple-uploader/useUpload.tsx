@@ -1,11 +1,18 @@
-import React, { useReducer, useEffect, useCallback } from "react"
-import { UPLOADFILE_LINK_MUTATION, REMOVE_LINK_MUTATION, SIGN_FILE, READ_GRAIN_RECEIPT_DATA } from "../queries"
+import React, { useReducer, useEffect, useCallback, useContext } from "react"
+import {
+  UPLOADFILE_LINK_MUTATION,
+  REMOVE_LINK_MUTATION,
+  SIGN_FILE,
+  READ_GRAIN_RECEIPT_DATA,
+  MODERATE_LINK_MUTATION
+} from "../queries"
 import { useMutation } from "react-apollo"
 import { client } from "../apollo-client"
-import { gatewayClient } from "../apollo-client-2"
+import { gatewayClient } from "../apollo-gateway"
 import filesize from "filesize"
 import { notifyServer } from "wx-notify"
 import accepts from "attr-accept"
+import UploaderContext from "./UnloaderContext"
 const OBJ_TYPE_GRAIN_RECEIPTS = 101
 
 const reducer = (state, action) => {
@@ -41,6 +48,15 @@ const reducer = (state, action) => {
       action.handleFileActions(filter)
       return { files: filter }
     }
+    case "moderate": {
+      const newArr = [...state.files]
+      newArr.forEach((file, index) => {
+        if (file._id == action.fileId) {
+          newArr[index].metadata.status = action.status
+        }
+      })
+      return { files: newArr }
+    }
     case "sign": {
       const newArr = [...state.files]
       newArr.forEach((file, index) => {
@@ -68,9 +84,9 @@ export const useUpload = ({
 }) => {
   const initialState = { files: initialFiles }
   const [state, dispatch] = useReducer(reducer, initialState)
-
+  const { uploadUri, gatewayUri } = useContext(UploaderContext)
   const [uploadMutation] = useMutation(UPLOADFILE_LINK_MUTATION, {
-    client,
+    client: client(uploadUri),
     context: {
       fetchOptions: {
         useUpload: true,
@@ -85,9 +101,10 @@ export const useUpload = ({
     }
   })
   const [readGrainReceiptData, { data, loading, error }] = useMutation(READ_GRAIN_RECEIPT_DATA, {
-    client: gatewayClient
+    client: gatewayClient(gatewayUri)
   })
-  const [removeMutation] = useMutation(REMOVE_LINK_MUTATION, { client })
+  const [removeMutation] = useMutation(REMOVE_LINK_MUTATION, { client: client(uploadUri) })
+  const [moderateMutation] = useMutation(MODERATE_LINK_MUTATION, { client: client(uploadUri) })
   // const [signMutation] = useMutation(SIGN_FILE, { client })
 
   const handleFileActions = useCallback(files => {
@@ -182,6 +199,10 @@ export const useUpload = ({
     }
     dispatch({ type: "remove", fileId, handleFileActions })
   }
+  const moderate = async (fileId, status) => {
+    const data = await moderateMutation({ variables: { fileId, status } })
+    dispatch({ type: "moderate", fileId, status })
+  }
 
   const sign = async signedFile => {
     //Сделано по костыльски, тк. передавая и запуская функцию handleFileActions внутри reducer-a приводит
@@ -199,6 +220,7 @@ export const useUpload = ({
     acceptedFiles: state.files,
     uploadFiles: upload,
     removeFile: remove, //remove,
+    moderateFile: moderate,
     signFile: sign,
     cancelUpload: null
   }

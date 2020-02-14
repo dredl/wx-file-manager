@@ -7,6 +7,7 @@ import { useQuery } from "react-apollo"
 import { GET_AVERAGE_GRAIN_RECEIPT_DATA } from "../../src/queries"
 import { gatewayClient } from "../../src/apollo-client-2"
 import GrainReceiptData from "./modals/GrainReceiptData"
+import UploaderContext from "../../src/multiple-uploader/UnloaderContext"
 const App: React.FC = () => {
   const fakeFile: any = {
     _id: "5d4154630e7f2e0bd4dc79ab",
@@ -32,6 +33,7 @@ const App: React.FC = () => {
   const [file, setFile] = useState(null)
   const [file2, setFile2] = useState(fakeFile)
   const [files, setFiles] = useState([])
+  const { gatewayUri } = useContext(UploaderContext)
   const { data, loading, error } = useQuery(GET_AVERAGE_GRAIN_RECEIPT_DATA, {
     client: gatewayClient,
     variables: { fileIds: files.filter(file => !file.loading).map(file => file._id) }
@@ -82,18 +84,14 @@ const App: React.FC = () => {
             allowMultiple={true}
             files={files}
             handleFiles={files => setFiles(files)}
+            enableDisable
             ExtraContents={ExtraContents}
-            // showFilename
-            // theme="button"
-            objType={101}
-            // file={file2}
-            // handleFile={file => setFile2(file)}
-            // maxFileSize={1024 * 1024 * 0.5}
-            // enableFakeRemove
+            objType={102}
             enableRemove
             needToSign
             extensions=".pdf"
-            userId="5d5a417bdd009a2d9f39f9c4"
+            userId="5e4504fb007ec8680cfa5967"
+            // showFileStatus
           />
           {/* <FileUploader
             tool="logo-manager"

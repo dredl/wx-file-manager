@@ -19,6 +19,7 @@ var apolloCacheInmemory = require('apollo-cache-inmemory');
 var apolloLink = require('apollo-link');
 var apolloUploadClient = require('apollo-upload-client');
 var apolloLinkContext = require('apollo-link-context');
+var Cookies = _interopDefault(require('js-cookie'));
 var accepts = _interopDefault(require('attr-accept'));
 
 /*! *****************************************************************************
@@ -116,7 +117,7 @@ function styleInject(css, ref) {
   }
 }
 
-var css = ".documents-tab .f-manager{width:100%;height:auto}.f-manager{display:flex;flex-direction:column;margin:10px 0;box-shadow:0 0 5px rgba(0,0,0,.32);background:#fff;border-radius:5px}.f-manager .jbtn{height:35px}.f-manager__block{position:relative;padding:0 12px;display:flex;height:46px;justify-content:space-between}.f-manager__block_item1,.f-manager__block_right{display:flex;align-items:center}.f-manager__block_item1{padding-left:0;margin-right:15px;width:100%;overflow:hidden}.f-manager__block_item1 .item1-text{overflow:hidden;width:60%;display:grid;flex-direction:column;align-items:start;padding:0;line-height:1.2}.f-manager__block_item1 .item1-text p{line-height:1.2;margin:0;font-size:15px;font-family:dinpro-bold;color:#333;white-space:nowrap;overflow:hidden;width:100%;text-overflow:ellipsis}.f-manager__block_item1 .item1-text span{font-size:11px;color:#b3b3b3;font-family:dinpro-med;text-align:left}.f-manager__block_item1 p{margin-bottom:0}.f-manager__block_item1 img{width:21px;height:21px;margin-right:10px}.f-manager__block_item4{box-shadow:none;background-color:transparent;border-left:1px solid #ccc;padding-left:10px;padding-right:0;display:flex;align-items:center;height:65%}.f-manager__block_item4 a{color:#333;font-family:dinpro-med;text-decoration:none;font-size:14px}.f-manager__block_new-doc{text-transform:uppercase;font-size:10px;border-top-right-radius:5px;border-bottom-right-radius:5px;padding:3px 15px;line-height:1;color:#fff;font-family:dinpro-bold;height:20px;position:absolute;right:0;top:14px;margin:auto -118px auto auto;background:linear-gradient(135deg,transparent 8px,#8d1843 0) 0 0,linear-gradient(45deg,transparent 8px,#8d1843 0) 0 100%;background-size:100% 50%;background-repeat:no-repeat}.f-manager__block_remove{cursor:pointer;border-left:1px solid #ccc;padding:0 7px 0 16px;background:#fff;margin-left:10px;display:flex;height:65%}.f-manager__block_remove img{width:15px}.f-manager__block_status{margin-bottom:0;font-size:12px;display:flex;line-height:1;align-items:center;font-family:dinpro-med;color:grey;max-width:176px;border:none;padding-right:10px;height:65%}.f-manager__block_status img{width:15px;margin-right:5px}.f-manager__block_status_error{color:red}.f-manager__signs{display:flex;align-items:center;justify-content:flex-end;height:46px}.f-manager__signs_label{font-size:13px;color:#333;font-family:dinpro-bold;margin-right:10px}.sign-button{margin-top:10px;display:flex;justify-content:flex-end}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9maWxlLXZpZXdlci5zY3NzIiwic3JjL3N0eWxlcy9fZm9udHMuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFDQSwwQkFFQyxVQUFXLENBQ1gsV0FBWSxDQUdiLFdBQ0UsWUFBYSxDQUNiLHFCQUFzQixDQUN0QixhQUFjLENBQ2Qsa0NBQXVDLENBQ3ZDLGVBQWlCLENBQ2pCLGlCQUFrQixDQU5wQixpQkFRSSxXQUFZLENBR2Qsa0JBQ0UsaUJBQWtCLENBQ2xCLGNBQWlCLENBQ2pCLFlBQWEsQ0FDYixXQUFZLENBQ1osNkJBQThCLENBTTlCLGdEQUhFLFlBQWEsQ0FDYixrQkFVZ0IsQ0FSbEIsd0JBQ0UsY0FBZSxDQUNmLGlCQUFrQixDQUNsQixVQUFXLENBS1gsZUFBZ0IsQ0FSakIsb0NBVUcsZUFBZ0IsQ0FDaEIsU0FBVSxDQUNWLFlBQWEsQ0FDYixxQkFBc0IsQ0FDdEIsaUJBQWtCLENBQ2xCLFNBQVUsQ0FDVixlQUFnQixDQWhCbkIsc0NBa0JLLGVBQWdCLENBQ2hCLFFBQVMsQ0FDVCxjQUFlLENBQ2YsdUJDakRhLENEa0RiLFVBQWMsQ0FDZCxrQkFBbUIsQ0FDbkIsZUFBZ0IsQ0FDaEIsVUFBVyxDQUNYLHNCQUFtRCxDQTFCeEQseUNBNkJLLGNBQWUsQ0FDZixhQUFjLENBQ2Qsc0JDNURXLENENkRYLGVBQWdCLENBaENyQiwwQkFvQ0csZUFBZ0IsQ0FwQ25CLDRCQXVDRyxVQUFXLENBQ1gsV0FBWSxDQUNaLGlCQUFrQixDQUd0Qix3QkFDRSxlQUFnQixDQUNoQiw0QkFBNkIsQ0FHN0IsMEJBQThCLENBQzlCLGlCQUFrQixDQUNsQixlQUFnQixDQUNoQixZQUFhLENBQ2Isa0JBQW1CLENBQ25CLFVBQVcsQ0FWWiwwQkFZRyxVQUFjLENBQ2Qsc0JDdEZhLENEdUZiLG9CQUFxQixDQUNyQixjQUFlLENBR25CLDBCQUNFLHdCQUF5QixDQUN6QixjQUFlLENBQ2YsMkJBQTRCLENBQzVCLDhCQUErQixDQUMvQixnQkFBaUIsQ0FDakIsYUFBYyxDQUNkLFVBQVksQ0FDWix1QkNsR2lCLENEbUdqQixXQUFZLENBRVosaUJBQWtCLENBQ2xCLE9BQVEsQ0FDUixRQUFTLENBQ1QsNEJBQW9CLENBQ3BCLHdIQUM4RCxDQUM5RCx3QkFBeUIsQ0FDekIsMkJBQTRCLENBRTlCLHlCQUNFLGNBQWUsQ0FDZiwwQkFBOEIsQ0FDOUIsb0JBQXFCLENBQ3JCLGVBQWlCLENBQ2pCLGdCQUFpQixDQUNqQixZQUFhLENBQ2IsVUFBVyxDQVBaLDZCQVNHLFVBQVcsQ0FHZix5QkFDRSxlQUFnQixDQUNoQixjQUFlLENBQ2YsWUFBYSxDQUNiLGFBQWMsQ0FDZCxrQkFBbUIsQ0FDbkIsc0JDakllLENEa0lmLFVBQWMsQ0FDZCxlQUFnQixDQUVoQixXQUFZLENBRVosa0JBQW1CLENBQ25CLFVBQVcsQ0FiWiw2QkFlRyxVQUFXLENBQ1gsZ0JBQWlCLENBRW5CLCtCQUNFLFNBQVUsQ0FJaEIsa0JBQ0UsWUFBYSxDQUNiLGtCQUFtQixDQUNuQix3QkFBeUIsQ0FDekIsV0FBWSxDQUNaLHdCQUNFLGNBQWUsQ0FDZixVQUFjLENBQ2QsdUJBQXdCLENBQ3hCLGlCQUFrQixDQUl4QixhQUNFLGVBQWdCLENBQ2hCLFlBQWEsQ0FDYix3QkFBeUIiLCJmaWxlIjoiZmlsZS12aWV3ZXIuc2NzcyJ9 */";
+var css = ".documents-tab .f-manager{width:100%;height:auto}.f-manager{display:flex;flex-direction:column;margin:10px 0;box-shadow:0 0 5px rgba(0,0,0,.32);background:#fff;border-radius:5px;width:100%}.f-manager .jbtn{height:35px}.f-manager__block{position:relative;padding:0 12px;display:flex;height:46px;justify-content:space-between}.f-manager__block_item1,.f-manager__block_right{display:flex;align-items:center}.f-manager__block_item1{padding-left:0;margin-right:15px;width:100%;overflow:hidden}.f-manager__block_item1 .item1-text{overflow:hidden;width:60%;display:grid;flex-direction:column;align-items:start;padding:0;line-height:1.2}.f-manager__block_item1 .item1-text p{line-height:1.2;margin:0;font-size:15px;font-family:dinpro-bold;color:#333;white-space:nowrap;overflow:hidden;width:100%;text-overflow:ellipsis}.f-manager__block_item1 .item1-text span{font-size:11px;color:#b3b3b3;font-family:dinpro-med;text-align:left}.f-manager__block_item1 p{margin-bottom:0}.f-manager__block_item1 img{width:21px;height:21px;margin-right:10px}.f-manager__block_item4{box-shadow:none;background-color:transparent;border-left:1px solid #ccc;padding-left:10px;padding-right:0;display:flex;align-items:center;height:65%}.f-manager__block_item4 a{color:#333;font-family:dinpro-med;text-decoration:none;font-size:14px}.f-manager__block_new-doc{text-transform:uppercase;font-size:10px;border-top-right-radius:5px;border-bottom-right-radius:5px;padding:3px 15px;line-height:1;color:#fff;font-family:dinpro-bold;height:20px;position:absolute;right:0;top:14px;margin:auto -118px auto auto;background:linear-gradient(135deg,transparent 8px,#8d1843 0) 0 0,linear-gradient(45deg,transparent 8px,#8d1843 0) 0 100%;background-size:100% 50%;background-repeat:no-repeat}.f-manager__block_remove{cursor:pointer;border-left:1px solid #ccc;padding:0 7px 0 16px;background:#fff;margin-left:10px;display:flex;height:65%}.f-manager__block_remove img{width:15px}.f-manager__block_status{margin-bottom:0;font-size:12px;display:flex;line-height:1;align-items:center;font-family:dinpro-med;color:grey;max-width:176px;border:none;padding-right:10px;height:65%}.f-manager__block_status img{width:15px;margin-right:5px}.f-manager__block_status_error{color:red}.f-manager__signs{display:flex;align-items:center;justify-content:flex-end;height:46px}.f-manager__signs_label{font-size:13px;color:#333;font-family:dinpro-bold;margin-right:10px}.sign-button{margin-top:10px;display:flex;justify-content:flex-end}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9maWxlLXZpZXdlci5zY3NzIiwic3JjL3N0eWxlcy9fZm9udHMuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFDQSwwQkFFQyxVQUFXLENBQ1gsV0FBWSxDQUdiLFdBQ0UsWUFBYSxDQUNiLHFCQUFzQixDQUN0QixhQUFjLENBQ2Qsa0NBQXVDLENBQ3ZDLGVBQWlCLENBQ2pCLGlCQUFrQixDQUNsQixVQUFXLENBUGIsaUJBU0ksV0FBWSxDQUdkLGtCQUNFLGlCQUFrQixDQUNsQixjQUFpQixDQUNqQixZQUFhLENBQ2IsV0FBWSxDQUNaLDZCQUE4QixDQU05QixnREFIRSxZQUFhLENBQ2Isa0JBVWdCLENBUmxCLHdCQUNFLGNBQWUsQ0FDZixpQkFBa0IsQ0FDbEIsVUFBVyxDQUtYLGVBQWdCLENBUmpCLG9DQVVHLGVBQWdCLENBQ2hCLFNBQVUsQ0FDVixZQUFhLENBQ2IscUJBQXNCLENBQ3RCLGlCQUFrQixDQUNsQixTQUFVLENBQ1YsZUFBZ0IsQ0FoQm5CLHNDQWtCSyxlQUFnQixDQUNoQixRQUFTLENBQ1QsY0FBZSxDQUNmLHVCQ2xEYSxDRG1EYixVQUFjLENBQ2Qsa0JBQW1CLENBQ25CLGVBQWdCLENBQ2hCLFVBQVcsQ0FDWCxzQkFBbUQsQ0ExQnhELHlDQTZCSyxjQUFlLENBQ2YsYUFBYyxDQUNkLHNCQzdEVyxDRDhEWCxlQUFnQixDQWhDckIsMEJBb0NHLGVBQWdCLENBcENuQiw0QkF1Q0csVUFBVyxDQUNYLFdBQVksQ0FDWixpQkFBa0IsQ0FHdEIsd0JBQ0UsZUFBZ0IsQ0FDaEIsNEJBQTZCLENBRzdCLDBCQUE4QixDQUM5QixpQkFBa0IsQ0FDbEIsZUFBZ0IsQ0FDaEIsWUFBYSxDQUNiLGtCQUFtQixDQUNuQixVQUFXLENBVlosMEJBWUcsVUFBYyxDQUNkLHNCQ3ZGYSxDRHdGYixvQkFBcUIsQ0FDckIsY0FBZSxDQUduQiwwQkFDRSx3QkFBeUIsQ0FDekIsY0FBZSxDQUNmLDJCQUE0QixDQUM1Qiw4QkFBK0IsQ0FDL0IsZ0JBQWlCLENBQ2pCLGFBQWMsQ0FDZCxVQUFZLENBQ1osdUJDbkdpQixDRG9HakIsV0FBWSxDQUVaLGlCQUFrQixDQUNsQixPQUFRLENBQ1IsUUFBUyxDQUNULDRCQUFvQixDQUNwQix3SEFDOEQsQ0FDOUQsd0JBQXlCLENBQ3pCLDJCQUE0QixDQUU5Qix5QkFDRSxjQUFlLENBQ2YsMEJBQThCLENBQzlCLG9CQUFxQixDQUNyQixlQUFpQixDQUNqQixnQkFBaUIsQ0FDakIsWUFBYSxDQUNiLFVBQVcsQ0FQWiw2QkFTRyxVQUFXLENBR2YseUJBQ0UsZUFBZ0IsQ0FDaEIsY0FBZSxDQUNmLFlBQWEsQ0FDYixhQUFjLENBQ2Qsa0JBQW1CLENBQ25CLHNCQ2xJZSxDRG1JZixVQUFjLENBQ2QsZUFBZ0IsQ0FFaEIsV0FBWSxDQUVaLGtCQUFtQixDQUNuQixVQUFXLENBYlosNkJBZUcsVUFBVyxDQUNYLGdCQUFpQixDQUVuQiwrQkFDRSxTQUFVLENBSWhCLGtCQUNFLFlBQWEsQ0FDYixrQkFBbUIsQ0FDbkIsd0JBQXlCLENBQ3pCLFdBQVksQ0FDWix3QkFDRSxjQUFlLENBQ2YsVUFBYyxDQUNkLHVCQUF3QixDQUN4QixpQkFBa0IsQ0FJeEIsYUFDRSxlQUFnQixDQUNoQixZQUFhLENBQ2Isd0JBQXlCIiwiZmlsZSI6ImZpbGUtdmlld2VyLnNjc3MifQ== */";
 styleInject(css);
 
 var grainReceiptsData = gql(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  fragment GrainReceiptsData on GrainReceiptsData {\n    docNumber\n    docTime\n    ownerBIN\n    elevator\n    elevatorBIN\n    specifications {\n      status\n      GRNumber\n      createTime\n      amount\n      culture\n      class\n      cropYear\n      category\n      grade\n      reproduction\n      seedCompositionClass\n      moisture\n      weedyImpurity\n      grainImpurity\n      infection\n      infectionLevel\n      smell\n      color\n      type\n      testWeight\n      gluten\n      glutenCU\n      hoodness\n      fallingNumber\n      protein\n      vitreousness\n      otherIndicators\n    }\n    errors\n  }\n"], ["\n  fragment GrainReceiptsData on GrainReceiptsData {\n    docNumber\n    docTime\n    ownerBIN\n    elevator\n    elevatorBIN\n    specifications {\n      status\n      GRNumber\n      createTime\n      amount\n      culture\n      class\n      cropYear\n      category\n      grade\n      reproduction\n      seedCompositionClass\n      moisture\n      weedyImpurity\n      grainImpurity\n      infection\n      infectionLevel\n      smell\n      color\n      type\n      testWeight\n      gluten\n      glutenCU\n      hoodness\n      fallingNumber\n      protein\n      vitreousness\n      otherIndicators\n    }\n    errors\n  }\n"])));
@@ -129,11 +130,12 @@ var CHECK_EDS_DATA = gql(templateObject_5 || (templateObject_5 = __makeTemplateO
 var GET_AVERAGE_GRAIN_RECEIPT_DATA = gql(templateObject_6 || (templateObject_6 = __makeTemplateObject(["\n  query getAverageGrainReceiptData($fileIds: [String]) {\n    getAverageGrainReceiptData(fileIds: $fileIds) {\n      ...GrainReceiptsData\n    }\n  }\n  ", "\n"], ["\n  query getAverageGrainReceiptData($fileIds: [String]) {\n    getAverageGrainReceiptData(fileIds: $fileIds) {\n      ...GrainReceiptsData\n    }\n  }\n  ", "\n"])), grainReceiptsData);
 var READ_GRAIN_RECEIPT_DATA = gql(templateObject_7 || (templateObject_7 = __makeTemplateObject(["\n  mutation readGrainReceiptData($fileId: String) {\n    readGrainReceiptData(fileId: $fileId) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"], ["\n  mutation readGrainReceiptData($fileId: String) {\n    readGrainReceiptData(fileId: $fileId) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"])), fileFragments.common);
 var REMOVE_LINK_MUTATION = gql(templateObject_8 || (templateObject_8 = __makeTemplateObject(["\n  mutation deleteFile($fileId: String) {\n    deleteUpload(fileId: $fileId)\n  }\n"], ["\n  mutation deleteFile($fileId: String) {\n    deleteUpload(fileId: $fileId)\n  }\n"])));
-var SIGN_FILE = gql(templateObject_9 || (templateObject_9 = __makeTemplateObject(["\n  mutation signDocument($fileId: String, $p12Base64: String, $password: String) {\n    signDocument(fileId: $fileId, p12Base64: $p12Base64, password: $password) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"], ["\n  mutation signDocument($fileId: String, $p12Base64: String, $password: String) {\n    signDocument(fileId: $fileId, p12Base64: $p12Base64, password: $password) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"])), fileFragments.common);
-var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7, templateObject_8, templateObject_9;
+var MODERATE_LINK_MUTATION = gql(templateObject_9 || (templateObject_9 = __makeTemplateObject(["\n  mutation moderateFile($fileId: String, $status: Int) {\n    moderateUpload(fileId: $fileId, status: $status) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"], ["\n  mutation moderateFile($fileId: String, $status: Int) {\n    moderateUpload(fileId: $fileId, status: $status) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"])), fileFragments.common);
+var SIGN_FILE = gql(templateObject_10 || (templateObject_10 = __makeTemplateObject(["\n  mutation signDocument($fileId: String, $p12Base64: String, $password: String) {\n    signDocument(fileId: $fileId, p12Base64: $p12Base64, password: $password) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"], ["\n  mutation signDocument($fileId: String, $p12Base64: String, $password: String) {\n    signDocument(fileId: $fileId, p12Base64: $p12Base64, password: $password) {\n      ...CommonFiles\n    }\n  }\n  ", "\n"])), fileFragments.common);
+var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7, templateObject_8, templateObject_9, templateObject_10;
 
 var httpLink = apolloLinkHttp.createHttpLink({
-    uri: "http://109.233.109.170:4003/graphql"
+    uri: "http://192.168.0.106:4003/graphql"
 });
 var customFetch = function (uri, options) {
     if (options.useUpload) {
@@ -142,13 +144,13 @@ var customFetch = function (uri, options) {
     return fetch(uri, options);
 };
 var uploadLink = apolloUploadClient.createUploadLink({
-    uri: "http://109.233.109.170:4003/graphql",
+    uri: "http://192.168.0.106:4003/graphql",
     fetch: customFetch
 });
 var authLink = apolloLinkContext.setContext(function (_, _a) {
     var headers = _a.headers;
     // get the authentication token from local storage if it exists
-    var token = localStorage.getItem("loginToken");
+    var token = Cookies.get("loginToken");
     var language = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "en-US";
     // return the headers to the context so httpLink can read them
     return {
@@ -377,14 +379,13 @@ var FilesProvider = function (props) {
         } }, children));
 };
 
-var token = localStorage.getItem("loginToken");
 var httpLink$1 = apolloLinkHttp.createHttpLink({
-    uri: "http://109.233.109.170:4000/graphql"
+    uri: "http://192.168.0.106:4000/graphql"
 });
 var authLink$1 = apolloLinkContext.setContext(function (_, _a) {
     var headers = _a.headers;
     // get the authentication token from local storage if it exists
-    var token = localStorage.getItem("loginToken");
+    var token = Cookies.get("loginToken");
     var language = "ru";
     // return the headers to the context so httpLink can read them
     return {
@@ -404,6 +405,7 @@ var messages = {
     en: {
         "chooseFile": "Choose File",
         "download": "View",
+        "moderate": "Moderate",
         "sign": "Sign",
         "Select the file with EDS": "Select EDS file (GOST)",
         "EDS": "EDS",
@@ -416,6 +418,7 @@ var messages = {
     ru: {
         "chooseFile": "Выберите файл",
         "download": "Просмотреть",
+        "moderate": "Модерация",
         "sign": "Подписать",
         "Select the file with EDS": "Выберите файл ЭЦП (GOST)",
         "EDS": "ЭЦП",
@@ -429,6 +432,7 @@ var messages = {
     kk: {
         "chooseFile": "Файлды тандаңыз",
         "download": "Карау",
+        "moderate": "Модерация",
         "sign": "Қол қою",
         "Select the file with EDS": "ЭЦҚ файлын таңданыз (GOST)",
         "EDS": "ЭЦҚ",
@@ -791,8 +795,34 @@ const img$8 = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0
 var css$4 = ".loader{display:flex;flex-direction:column;align-items:center;position:absolute;left:0;bottom:0;z-index:1;width:100%;height:100%;background-color:hsla(0,0%,100%,.8);border-bottom-right-radius:10px;border-bottom-left-radius:10px}.loader:after,.loader:before{content:\"\";flex:1}.loader--eds .loader__spinner{width:100px;height:100px;background:#ffd012}.loader--modal{height:calc(100% - 81px)}.loader--modal-step{height:calc(100% - 95px)}.loader--grid-view{height:calc(100% - 38px)}.loader--goods{top:0;border-radius:10px}.loader--nav-right{top:50%;left:50%;transform:translate(-50%,-50%);background-color:#fff}.loader__content{display:flex;flex-direction:column;align-items:center}.loader__spinner{position:relative;width:140px;height:140px;margin:0;background-color:#f7f7f7;border-radius:50%}.loader--modal-step .loader__spinner,.loader--modal .loader__spinner{width:100px;height:100px;background-color:#ffd012}.loader--main .loader__spinner{background-color:#ffd012}.loader__text{margin:0;font-family:dinpro-med;text-align:center}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9tdWx0aXBsZS11cGxvYWRlci9tb2RhbHMvaW5kZXguc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFDQSxRQUNJLFlBQWEsQ0FDYixxQkFBc0IsQ0FDdEIsa0JBQW1CLENBRW5CLGlCQUFrQixDQUNsQixNQUFPLENBQ1AsUUFBUyxDQUNULFNBQVUsQ0FFVixVQUFXLENBQ1gsV0FBWSxDQUVaLG1DQUEwQyxDQUUxQywrQkFBZ0MsQ0FDaEMsOEJBQStCLENBaEJuQyw2QkFvQk0sVUFBVyxDQUNYLE1BQU8sQ0FFUiw4QkFFRyxXQUFZLENBQ1osWUFBYSxDQUNiLGtCQUFtQixDQUd2QixlQUNFLHdCQUF5QixDQUczQixvQkFDRSx3QkFBeUIsQ0FHM0IsbUJBQ0Usd0JBQXlCLENBRzNCLGVBQ0UsS0FBTSxDQUVOLGtCQUFtQixDQUdyQixtQkFDRSxPQUFRLENBQ1IsUUFBUyxDQUNULDhCQUFnQyxDQUNoQyxxQkFBb0MsQ0FHdEMsaUJBQ0UsWUFBYSxDQUNiLHFCQUFzQixDQUN0QixrQkFBbUIsQ0FHckIsaUJBQ0UsaUJBQWtCLENBQ2xCLFdBQVksQ0FDWixZQUFhLENBQ2IsUUFBUyxDQUVULHdCQUF5QixDQUN6QixpQkFBa0IsQ0FHcEIscUVBRUUsV0FBWSxDQUNaLFlBQWEsQ0FFYix3QkFBeUIsQ0FHM0IsK0JBQ0Usd0JBQXlCLENBVzNCLGNBQ0UsUUFBUyxDQUNULHNCQUF1QixDQUN2QixpQkFBa0IiLCJmaWxlIjoiaW5kZXguc2NzcyJ9 */";
 styleInject(css$4);
 
-var _this$4 = undefined;
 var language$2 = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "ru";
+var Moderate = function (props) {
+    var _a = React.useState(false), modal = _a[0], setModal = _a[1];
+    var handleModerate = props.handleModerate, fileId = props.fileId;
+    var toggle = function (e) {
+        e.preventDefault();
+        setModal(!modal);
+    };
+    return (React__default.createElement(React__default.Fragment, null,
+        React__default.createElement("span", { className: "f-manager__block_item4", style: { marginRight: "10px" } },
+            React__default.createElement("a", { href: "#", target: "_blank", onClick: toggle }, messages[language$2].moderate)),
+        React__default.createElement(reactstrap.Modal, { isOpen: modal, className: "prompt", centered: true, toggle: toggle, backdrop: "static" },
+            React__default.createElement(reactstrap.ModalHeader, null, "\u0423\u0434\u0430\u043B\u0435\u043D\u0438\u0435 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430"),
+            React__default.createElement(reactstrap.ModalBody, null, "\u0412\u044B \u0443\u0432\u0435\u0440\u0435\u043D\u044B \u0447\u0442\u043E \u0445\u043E\u0442\u0438\u0442\u0435 \u0443\u0434\u0430\u043B\u0438\u0442\u044C \u0444\u0430\u0439\u043B?"),
+            React__default.createElement(reactstrap.ModalFooter, null,
+                React__default.createElement("button", { className: "jbtn jbtn-low jbtn-cancel", onClick: function (e) { return toggle(e); } }, "\u041E\u0442\u043C\u0435\u043D\u0430"),
+                React__default.createElement("button", { className: "jbtn jbtn-low jbtn-red", onClick: function (e) {
+                        handleModerate(e, fileId, 0);
+                        setModal(false);
+                    } }, "\u0423\u0434\u0430\u043B\u0438\u0442\u044C"),
+                React__default.createElement("button", { className: "jbtn jbtn-low jbtn-green", onClick: function (e) {
+                        handleModerate(e, fileId, 2);
+                        setModal(false);
+                    } }, "\u041F\u043E\u0434\u0432\u0435\u0440\u0434\u0438\u0442\u044C")))));
+};
+
+var _this$4 = undefined;
+var language$3 = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "ru";
 var SignFile$1 = function (props) {
     var _a = React.useState(false), modal = _a[0], setModal = _a[1];
     var _b = React.useState(false), modal2 = _b[0], setModal2 = _b[1];
@@ -911,37 +941,37 @@ var SignFile$1 = function (props) {
             return (React__default.createElement("ul", { className: "reg-info" },
                 React__default.createElement("li", null,
                     React__default.createElement("p", null,
-                        messages[language$2]["Owner of EDS"],
+                        messages[language$3]["Owner of EDS"],
                         ":"),
                     React__default.createElement("p", { className: "ecp-info" }, EDSdata.owner)),
                 React__default.createElement("li", null,
                     React__default.createElement("p", null,
-                        messages[language$2]["Authority issuing EDS"],
+                        messages[language$3]["Authority issuing EDS"],
                         ":"),
                     React__default.createElement("p", { className: "ecp-info" }, EDSdata.issuer)),
                 React__default.createElement("li", null,
                     React__default.createElement("p", null,
-                        messages[language$2]["Valid thought"],
+                        messages[language$3]["Valid thought"],
                         ":"),
                     React__default.createElement("p", { className: "ecp-info" }, EDSdata.expireTime)),
                 React__default.createElement("li", null,
                     React__default.createElement("p", null,
-                        messages[language$2]["IIN"],
+                        messages[language$3]["IIN"],
                         ":"),
                     React__default.createElement("p", { className: "ecp-info" }, EDSdata.iin)),
                 React__default.createElement("li", null,
                     React__default.createElement("p", null,
-                        messages[language$2]["BIN"],
+                        messages[language$3]["BIN"],
                         ":"),
                     React__default.createElement("p", { className: "ecp-info" }, EDSdata.bin))));
         }
         return (React__default.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: "45px" } },
             React__default.createElement("input", { type: "file", id: "EDS-sign-" + randInd, required: true, onChange: function (e) { return handleEDS(e); }, accept: ".p12", style: { display: "none" } }),
-            React__default.createElement("label", { htmlFor: "EDS-sign-" + randInd, className: "jbtn jbtn-fuksiya" }, messages[language$2]["Select the file with EDS"])));
+            React__default.createElement("label", { htmlFor: "EDS-sign-" + randInd, className: "jbtn jbtn-fuksiya" }, messages[language$3]["Select the file with EDS"])));
     };
     return (React__default.createElement(React__default.Fragment, null,
         React__default.createElement("div", { className: "sign-button" },
-            React__default.createElement("button", { className: "jbtn jbtn-wide jbtn-green", onClick: function (e) { return toggle(e); } }, messages[language$2].sign)),
+            React__default.createElement("button", { className: "jbtn jbtn-wide jbtn-green", onClick: function (e) { return toggle(e); } }, messages[language$3].sign)),
         React__default.createElement(reactstrap.Modal, { isOpen: modal, className: "prompt", centered: true, toggle: toggle, backdrop: "static" },
             React__default.createElement(reactstrap.ModalHeader, null, "\u041F\u043E\u0434\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430"),
             (sLoading || loading) && React__default.createElement(StdLoader$1, { type: "modal", text: "\u041F\u043E\u0434\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0444\u0430\u0439\u043B\u0430, \u043F\u043E\u0434\u043E\u0436\u0434\u0438\u0442\u0435" }),
@@ -980,7 +1010,7 @@ var StdLoader$1 = function (_a) {
 
 var _this$5 = undefined;
 var OBJ_TYPE_GRAIN_RECEIPTS = 101;
-var language$3 = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "ru";
+var language$4 = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "ru";
 var StdSpinner$1 = function () {
     return (React__default.createElement("div", { className: "mad-uploader-spinner" },
         React__default.createElement("div", { className: "sk-three-bounce" },
@@ -1002,7 +1032,7 @@ var SignFileStatus$1 = function (_a) {
 var Download$1 = function (_a) {
     var path = _a.path;
     return (React__default.createElement("span", { className: "f-manager__block_item4" },
-        React__default.createElement("a", { href: path, target: "_blank" }, messages[language$3].download)));
+        React__default.createElement("a", { href: path, target: "_blank" }, messages[language$4].download)));
 };
 var Remove$1 = function (_a) {
     var removeDoc = _a.removeDoc;
@@ -1010,7 +1040,7 @@ var Remove$1 = function (_a) {
         React__default.createElement("img", { src: img$4, alt: "" })));
 };
 var Viewer$1 = function (_a) {
-    var _b = _a.enableRemove, enableRemove = _b === void 0 ? false : _b, file = _a.file, _c = _a.userId, userId = _c === void 0 ? null : _c, _d = _a.handleRemove, handleRemove = _d === void 0 ? null : _d, ExtraContent = _a.ExtraContent, _e = _a.handleSign, handleSign = _e === void 0 ? null : _e, showFilename = _a.showFilename;
+    var _b = _a.enableRemove, enableRemove = _b === void 0 ? false : _b, _c = _a.enableModerate, enableModerate = _c === void 0 ? false : _c, file = _a.file, _d = _a.userId, userId = _d === void 0 ? null : _d, _e = _a.handleRemove, handleRemove = _e === void 0 ? null : _e, _f = _a.handleModerate, handleModerate = _f === void 0 ? null : _f, ExtraContent = _a.ExtraContent, _g = _a.handleSign, handleSign = _g === void 0 ? null : _g, showFilename = _a.showFilename;
     var isLoading = file ? file.loading : false;
     var needToSign = false; //Нужно ли currentUser-у подписывать документ
     var signed = false; // подписал ли currentUser документ
@@ -1030,6 +1060,13 @@ var Viewer$1 = function (_a) {
             return [2 /*return*/];
         });
     }); };
+    var onModerate = function (e, fileId, status) { return __awaiter(_this$5, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            e.preventDefault();
+            handleModerate(fileId, status);
+            return [2 /*return*/];
+        });
+    }); };
     return (React__default.createElement(React__default.Fragment, null,
         React__default.createElement("div", { className: "f-manager" },
             React__default.createElement("div", { className: "f-manager__block" },
@@ -1038,6 +1075,7 @@ var Viewer$1 = function (_a) {
                     React__default.createElement("div", { className: "item1-text" },
                         React__default.createElement("p", { title: showFilename ? file.name : file.metadata.title }, showFilename ? file.name : file.metadata.title))),
                 React__default.createElement("div", { className: "f-manager__block_right" },
+                    !isLoading && enableModerate && React__default.createElement(Moderate, { fileId: file._id, handleModerate: onModerate }),
                     !isLoading && React__default.createElement(Download$1, { path: file.path }),
                     !isLoading && ExtraContent && React__default.createElement(ExtraContent, null),
                     !isLoading && enableRemove && React__default.createElement(Remove$1, { removeDoc: function (e) { return onRemove(e, file._id); } }),
@@ -1154,14 +1192,23 @@ var reducer = function (state, action) {
             action.handleFileActions(filter);
             return { files: filter };
         }
-        case "sign": {
+        case "moderate": {
             var newArr_2 = state.files.slice();
             newArr_2.forEach(function (file, index) {
-                if (file._id == action.file._id) {
-                    newArr_2[index] = action.file;
+                if (file._id == action.fileId) {
+                    newArr_2[index].metadata.status = action.status;
                 }
             });
             return { files: newArr_2 };
+        }
+        case "sign": {
+            var newArr_3 = state.files.slice();
+            newArr_3.forEach(function (file, index) {
+                if (file._id == action.file._id) {
+                    newArr_3[index] = action.file;
+                }
+            });
+            return { files: newArr_3 };
         }
         default:
             return state;
@@ -1190,6 +1237,7 @@ var useUpload = function (_a) {
         client: gatewayClient
     }), readGrainReceiptData = _e[0], _f = _e[1], data = _f.data, loading = _f.loading, error = _f.error;
     var removeMutation = reactApollo.useMutation(REMOVE_LINK_MUTATION, { client: client })[0];
+    var moderateMutation = reactApollo.useMutation(MODERATE_LINK_MUTATION, { client: client })[0];
     // const [signMutation] = useMutation(SIGN_FILE, { client })
     var handleFileActions = React.useCallback(function (files) {
         handleFiles && allowMultiple && handleFiles(files);
@@ -1304,6 +1352,18 @@ var useUpload = function (_a) {
             }
         });
     }); };
+    var moderate = function (fileId, status) { return __awaiter(_this$6, void 0, void 0, function () {
+        var data;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, moderateMutation({ variables: { fileId: fileId, status: status } })];
+                case 1:
+                    data = _a.sent();
+                    dispatch({ type: "moderate", fileId: fileId, status: status });
+                    return [2 /*return*/];
+            }
+        });
+    }); };
     var sign = function (signedFile) { return __awaiter(_this$6, void 0, void 0, function () {
         var newArr;
         return __generator(this, function (_a) {
@@ -1324,6 +1384,7 @@ var useUpload = function (_a) {
         acceptedFiles: state.files,
         uploadFiles: upload,
         removeFile: remove,
+        moderateFile: moderate,
         signFile: sign,
         cancelUpload: null
     };
@@ -1336,9 +1397,9 @@ var useUpload = function (_a) {
 var FileManager = function (props) {
     var _a = props.allowMultiple, allowMultiple = _a === void 0 ? false : _a, files = props.files, file = props.file, _b = props.handleFile, handleFile = _b === void 0 ? null : _b, _c = props.handleFiles, handleFiles = _c === void 0 ? null : _c, _d = props.ExtraContent, ExtraContent = _d === void 0 ? function () { return React__default.createElement(React__default.Fragment, null); } : _d, _e = props.ExtraContents, ExtraContents = _e === void 0 ? [] : _e, _f = props.theme, theme = _f === void 0 ? "default" : _f, _g = props.userId, userId = _g === void 0 ? null : _g, _h = props.uploadText, uploadText = _h === void 0 ? "Загрузка файлов" : _h, _j = props.extensions, extensions = _j === void 0 ? "" : _j, _k = props.objId, objId = _k === void 0 ? "" : _k, _l = props.objType, objType = _l === void 0 ? 999 : _l, _m = props.objCode, objCode = _m === void 0 ? "" : _m, _o = props.maxFileSize, maxFileSize = _o === void 0 ? 1024 * 1024 * 5 : _o, //5MB
     _p = props.needToSign, //5MB
-    needToSign = _p === void 0 ? false : _p, _q = props.enableRemove, enableRemove = _q === void 0 ? false : _q, _r = props.enableFakeRemove, enableFakeRemove = _r === void 0 ? false : _r, _s = props.showFilename, showFilename = _s === void 0 ? false : _s;
+    needToSign = _p === void 0 ? false : _p, _q = props.enableRemove, enableRemove = _q === void 0 ? false : _q, _r = props.enableDisable, enableDisable = _r === void 0 ? false : _r, _s = props.enableFakeRemove, enableFakeRemove = _s === void 0 ? false : _s, _t = props.showFilename, showFilename = _t === void 0 ? false : _t;
     var metadata = { objType: objType, objId: objId, objCode: objCode, needToSign: needToSign };
-    var _t = useUpload({
+    var _u = useUpload({
         allowMultiple: allowMultiple,
         metadata: metadata,
         initialFiles: allowMultiple ? files : file ? [file] : [],
@@ -1347,7 +1408,7 @@ var FileManager = function (props) {
         extensions: extensions,
         handleFile: handleFile,
         handleFiles: handleFiles
-    }), acceptedFiles = _t.acceptedFiles, uploadFiles = _t.uploadFiles, removeFile = _t.removeFile, signFile = _t.signFile;
+    }), acceptedFiles = _u.acceptedFiles, uploadFiles = _u.uploadFiles, removeFile = _u.removeFile, moderateFile = _u.moderateFile, signFile = _u.signFile;
     //Передаем файлы родителю при каждом изменении
     // @deprecated - пришлось эту логику отправлять в useUpload, тк handleFile должен срабатывать только тогда когда
     // реально происходит зарузка-удаление-подписание. А по ЭТОЙ логике handleFiles будет вызываться как мин когда компонент
@@ -1401,7 +1462,7 @@ var FileManager = function (props) {
         React__default.createElement(Uploader, null),
         React__default.createElement("div", null, acceptedFiles
             .map(function (file, key) {
-            return (React__default.createElement(Viewer$1, { file: file, key: key, userId: userId, handleRemove: removeFile, enableRemove: enableRemove, handleSign: signFile, ExtraContent: allowMultiple ? (ExtraContents.length > 0 ? ExtraContents[key] : ExtraContent) : ExtraContent, showFilename: showFilename }));
+            return (React__default.createElement(Viewer$1, { file: file, key: key, userId: userId, handleRemove: removeFile, handleModerate: moderateFile, enableRemove: enableRemove, enableModerate: enableDisable, handleSign: signFile, ExtraContent: allowMultiple ? (ExtraContents.length > 0 ? ExtraContents[key] : ExtraContent) : ExtraContent, showFilename: showFilename }));
         })
             .reverse())));
 };

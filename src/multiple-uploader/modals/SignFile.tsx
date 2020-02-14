@@ -1,14 +1,15 @@
-import React, { useState, FC, useEffect } from "react"
+import React, { useState, FC, useEffect, useContext } from "react"
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap"
 import InputStyleOne from "input-style-one"
 import notify, { notifyServer } from "wx-notify"
 import { useMutation } from "react-apollo"
 import { CHECK_EDS_DATA, SIGN_FILE } from "../../queries"
-import { gatewayClient } from "../../apollo-client-2"
+import { gatewayClient } from "../../apollo-gateway"
 import { client } from "../../apollo-client"
 import { messages } from "../../i18n"
 import "./index.scss"
 import loader from "../../../assets/loader-white.gif"
+import UploaderContext from "../UnloaderContext"
 const language = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "ru"
 interface ISignFile {
   fileId: string
@@ -20,7 +21,7 @@ const SignFile: FC<ISignFile> = props => {
   const [modal2, setModal2] = useState(false)
   const [password, setPassword] = useState({ value: "Qwerty12", isValid: false })
   const [p12Base64, setP12Base64] = useState(null)
-
+  const { uploadUri, gatewayUri } = useContext(UploaderContext)
   useEffect(() => {
     return () => {
       setModal(false)
@@ -48,10 +49,10 @@ const SignFile: FC<ISignFile> = props => {
   const handleSignParent = props.handleSign
 
   /** Лучше mutation делать здесь т.к. легче хендлить loading, error непосредственно в компоненте, где она и используется  */
-  const [signFile, { loading: sLoading }] = useMutation(SIGN_FILE, { client })
+  const [signFile, { loading: sLoading }] = useMutation(SIGN_FILE, { client: client(uploadUri) })
 
   const [EDSdata, setEDSData] = useState(null)
-  const [checkEDSData, { loading, error }] = useMutation(CHECK_EDS_DATA, { client: gatewayClient })
+  const [checkEDSData, { loading, error }] = useMutation(CHECK_EDS_DATA, { client: gatewayClient(gatewayUri) })
 
   const handleSign = async (e, fileId) => {
     e.preventDefault()

@@ -59,6 +59,7 @@ export const fileFragments = {
           signed
           label
         }
+        status
       }
       grainReceiptData {
         ...GrainReceiptsData
@@ -118,6 +119,14 @@ export const REMOVE_LINK_MUTATION = gql`
   mutation deleteFile($fileId: String) {
     deleteUpload(fileId: $fileId)
   }
+`
+export const MODERATE_LINK_MUTATION = gql`
+  mutation moderateFile($fileId: String, $status: Int) {
+    moderateUpload(fileId: $fileId, status: $status) {
+      ...CommonFiles
+    }
+  }
+  ${fileFragments.common}
 `
 export const SIGN_FILE = gql`
   mutation signDocument($fileId: String, $p12Base64: String, $password: String) {

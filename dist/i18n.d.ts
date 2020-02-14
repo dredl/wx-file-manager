@@ -2,6 +2,7 @@ export declare const messages: {
     en: {
         "chooseFile": string;
         "download": string;
+        "moderate": string;
         "sign": string;
         "Select the file with EDS": string;
         "EDS": string;
@@ -14,6 +15,7 @@ export declare const messages: {
     ru: {
         "chooseFile": string;
         "download": string;
+        "moderate": string;
         "sign": string;
         "Select the file with EDS": string;
         "EDS": string;
@@ -27,6 +29,7 @@ export declare const messages: {
     kk: {
         "chooseFile": string;
         "download": string;
+        "moderate": string;
         "sign": string;
         "Select the file with EDS": string;
         "EDS": string;

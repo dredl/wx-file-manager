@@ -68,7 +68,7 @@ const GrainReceiptData: FC<any> = props => {
       {isAverageModal ? (
         <CustomButton toggle={toggle} />
       ) : (
-        <span className="f-manager__block_item4" style={{ marginLeft: "10px" }} onClick={toggle}>
+        <span className="f-manager__block_item4" onClick={toggle}>
           <a href="#" onClick={toggle}>
             Результаты
           </a>

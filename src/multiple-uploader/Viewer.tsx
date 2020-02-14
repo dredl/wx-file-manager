@@ -6,7 +6,7 @@ import crossRed from "../../assets/cross_red.svg"
 import cross from "../../assets/34Graycross.svg"
 import clock from "../../assets/clox.svg"
 import doc10 from "../../assets/10doc.svg"
-
+import ModerateModal from "./modals/Moderate"
 import { messages } from "../i18n"
 import SignFile from "./modals/SignFile"
 const OBJ_TYPE_GRAIN_RECEIPTS = 101
@@ -23,23 +23,82 @@ const StdSpinner = () => {
     </div>
   )
 }
-const SignFileStatus = ({ signs, objType }) => {
-  if (signs.length == 0) {
-    return <></>
+const SignFileStatus = ({ metadata, showFileStatus }) => {
+  const { signs, objType, status } = metadata
+
+  const FileStatus = () => {
+    if (!showFileStatus) {
+      return <></>
+    }
+    let data = {
+      icon: "",
+      className: "",
+      label: ""
+    }
+    // отклонен
+    if (status == 0) {
+      data = { icon: crossRed, className: "f-manager__block_status_error", label: "Отклонен" }
+    }
+    //на модерации
+    if (status == 1) {
+      data = { icon: clock, className: "", label: "Ожидает модерации" }
+    }
+    // проверен
+    if (status == 2) {
+      data = { icon: galka, className: "", label: "Проверен" }
+    }
+    return (
+      <>
+        <span className="f-manager__signs_label">Статус документа:</span>
+        <div className="f-manager__block_status">
+          <img src={data.icon} alt="" />
+          <span className={data.className}>{data.label}</span>
+        </div>
+      </>
+    )
   }
+
+  const SignsStatus = () => {
+    if (signs.length == 0 || objType == OBJ_TYPE_GRAIN_RECEIPTS) {
+      return <></>
+    }
+    return (
+      <>
+        <span className="f-manager__signs_label">
+          {objType == OBJ_TYPE_GRAIN_RECEIPTS ? "Статус зерновой расписки:" : "Подписи:"}
+        </span>
+        {signs.map((sign, key) => (
+          <div className="f-manager__block_status" key={key}>
+            <img src={sign.signed ? galka : clock} alt="" />
+            <span>{sign.label}</span>
+          </div>
+        ))}
+      </>
+    )
+  }
+
+  const GrainReceiptsStatus = () => {
+    if (signs.length == 0 || objType != OBJ_TYPE_GRAIN_RECEIPTS) {
+      return <></>
+    }
+    return (
+      <>
+        <span className="f-manager__signs_label">Статус зерновой расписки:</span>
+        {signs.map((sign, key) => (
+          <div className="f-manager__block_status" key={key}>
+            <img src={sign.signed ? galka : crossRed} alt="" />
+            <span className={!sign.signed ? "f-manager__block_status_error" : ""}>{sign.label}</span>
+          </div>
+        ))}
+      </>
+    )
+  }
+
   return (
     <div className="f-manager__signs">
-      <span className="f-manager__signs_label">
-        {objType == OBJ_TYPE_GRAIN_RECEIPTS ? "Статус зерновой расписки:" : "Подписи:"}
-      </span>
-      {signs.map((sign, key) => (
-        <div className="f-manager__block_status" key={key}>
-          <img src={sign.signed ? galka : objType == OBJ_TYPE_GRAIN_RECEIPTS ? crossRed : clock} alt="" />
-          <span className={!sign.signed && objType == OBJ_TYPE_GRAIN_RECEIPTS ? "f-manager__block_status_error" : ""}>
-            {sign.label}
-          </span>
-        </div>
-      ))}
+      <FileStatus />
+      <GrainReceiptsStatus />
+      <SignsStatus />
     </div>
   )
 }
@@ -62,30 +121,36 @@ const Remove = ({ removeDoc }) => {
 
 interface IViewer {
   enableRemove?: boolean
+  enableModerate?: boolean
   staticFile?: any
   file: any
   userId: any
   handleRemove: any
+  handleModerate: any
   handleSign: any
   ExtraContent: any
   enableFakeRemove?: boolean
   handleFakeRemove?: any
   showFilename: boolean
+  showFileStatus: boolean
 }
 
 const Viewer: React.FC<IViewer> = ({
   enableRemove = false,
+  enableModerate = false,
   file,
   userId = null,
   handleRemove = null,
+  handleModerate = null,
   ExtraContent,
   handleSign = null,
-  showFilename
+  showFilename,
+  showFileStatus
 }) => {
   const isLoading = file ? file.loading : false
 
-  let needToSign = false //Нужно ли currentUser-у подписывать документ
-  let signed = false // подписал ли currentUser документ
+  let needToSign = false // Нужно ли currentUser-у подписывать документ
+  let signed = false // Подписал ли currentUser документ
 
   /** Если он есть в списке sings то ему нужно подписать дкумент */
   file.metadata.signs.forEach(sign => {
@@ -99,6 +164,10 @@ const Viewer: React.FC<IViewer> = ({
   const onRemove = async (e: Event, fileId: string) => {
     e.preventDefault()
     handleRemove(fileId)
+  }
+  const onModerate = async (e: Event, fileId: string, status: number) => {
+    e.preventDefault()
+    handleModerate(fileId, status)
   }
   return (
     <>
@@ -114,13 +183,15 @@ const Viewer: React.FC<IViewer> = ({
           </div>
 
           <div className="f-manager__block_right">
+            {!isLoading && enableModerate && <ModerateModal fileId={file._id} handleModerate={onModerate} />}
             {!isLoading && <Download path={file.path} />}
             {!isLoading && ExtraContent && <ExtraContent />}
             {!isLoading && enableRemove && <Remove removeDoc={e => onRemove(e, file._id)} />}
+
             {isLoading && <StdSpinner />}
           </div>
         </div>
-        {!isLoading && <SignFileStatus signs={file.metadata.signs} objType={file.metadata.objType} />}
+        {!isLoading && <SignFileStatus metadata={file.metadata} showFileStatus={showFileStatus} />}
       </div>
       {needToSign && !signed && <SignFile fileId={file._id} handleSign={handleSign} />}
     </>
