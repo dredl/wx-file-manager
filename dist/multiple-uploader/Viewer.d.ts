@@ -13,6 +13,7 @@ interface IViewer {
     enableFakeRemove?: boolean;
     handleFakeRemove?: any;
     showFilename: boolean;
+    showFileStatus: boolean;
 }
 declare const Viewer: React.FC<IViewer>;
 export default Viewer;

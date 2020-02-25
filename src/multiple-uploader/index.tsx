@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, FC } from "react"
 import addFile from "../../assets/add-file.svg"
 import filesize from "filesize"
 import Viewer from "./Viewer"
@@ -17,8 +17,8 @@ interface IFileManager {
   files?: Array<object> // если allowMultiple = true files помещяются сюда
   handleFile?(file: object): void // если allowMultiple = false срабатывает он
   handleFiles?(files: Array<object>): void // если allowMultiple = true срабатывает он
-  ExtraContent?: JSX.Element
-  ExtraContents?: Array<JSX.Element>
+  ExtraContent?: FC
+  ExtraContents?: Array<FC>
   //остальные пропсы работают независимо от allowMultiple
   theme?: string
   userId?: string
@@ -30,7 +30,7 @@ interface IFileManager {
   maxFileSize?: number
   needToSign?: boolean
   enableRemove?: boolean
-  enableDisable?: boolean
+  enableModerate?: boolean
   enableFakeRemove?: boolean
   showFilename?: boolean // Отображать file.name или file.metadata.title. по умолчанию false
   showFileStatus?: boolean // Отображать ли статус файла. 0 - отклонен, 1 на модерации 2 проверен
@@ -59,7 +59,7 @@ export const FileManager: React.FC<IFileManager> = props => {
     maxFileSize = 1024 * 1024 * 5, //5MB
     needToSign = false,
     enableRemove = false,
-    enableDisable = false,
+    enableModerate = false,
     enableFakeRemove = false,
     showFilename = false,
     showFileStatus = false
@@ -152,7 +152,7 @@ export const FileManager: React.FC<IFileManager> = props => {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", width: "inherit" }}>
+    <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
       <Uploader />
       <div>
         {acceptedFiles
@@ -165,7 +165,7 @@ export const FileManager: React.FC<IFileManager> = props => {
                 handleRemove={removeFile}
                 handleModerate={moderateFile}
                 enableRemove={enableRemove}
-                enableModerate={enableDisable}
+                enableModerate={enableModerate}
                 handleSign={signFile}
                 ExtraContent={
                   allowMultiple ? (ExtraContents.length > 0 ? ExtraContents[key] : ExtraContent) : ExtraContent

@@ -1,29 +1,22 @@
-import ApolloClient from "apollo-client"
-import { createHttpLink } from "apollo-link-http"
-import { InMemoryCache } from "apollo-cache-inmemory"
-import { ApolloLink, split } from "apollo-link"
-import { setContext } from "apollo-link-context"
+import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client"
+import { ApolloLink } from "apollo-link"
 import Cookies from "js-cookie"
 
-const httpLink = uri => createHttpLink({ uri })
-
-const authLink = setContext((_, { headers }) => {
-  // get the authentication token from local storage if it exists
+const authLink = new ApolloLink((operation, forward) => {
   const token = Cookies.get("loginToken")
-  const language = "ru"
-  // return the headers to the context so httpLink can read them
-  return {
+  const language = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "en"
+  operation.setContext({
     headers: {
-      ...headers,
-      "authorization": token ? token : "", // `Bearer ${token}` : "",
+      "authorization": token ? token : "",
       "accept-language": language
     }
-  }
+  })
+  return forward(operation)
 })
 
 export const gatewayClient = uri =>
   new ApolloClient({
-    link: ApolloLink.from([authLink, httpLink(uri)]),
+    link: authLink.concat(new HttpLink({ uri }) as any) as any,
     cache: new InMemoryCache({
       dataIdFromObject: (o: any) => {
         return o.id ? `${o.__typename}:${o.id}` : null

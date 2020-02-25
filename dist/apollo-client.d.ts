@@ -1,3 +1,2 @@
-import ApolloClient from "apollo-client";
-export declare const client: ApolloClient<import("apollo-cache-inmemory").NormalizedCacheObject>;
-export declare const uploadFetch: (url: string, options: any) => Promise<unknown>;
+import { ApolloClient } from "@apollo/client";
+export declare const client: (uri: any) => ApolloClient<import("@apollo/client").NormalizedCacheObject>;

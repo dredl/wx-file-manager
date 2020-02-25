@@ -25,7 +25,9 @@ const StdSpinner = () => {
 }
 const SignFileStatus = ({ metadata, showFileStatus }) => {
   const { signs, objType, status } = metadata
-
+  if (!showFileStatus && signs.length == 0) {
+    return <></>
+  }
   const FileStatus = () => {
     if (!showFileStatus) {
       return <></>

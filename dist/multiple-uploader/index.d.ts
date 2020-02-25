@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FC } from "react";
 import "../index.scss";
 interface IFileManager {
     allowMultiple?: boolean;
@@ -6,8 +6,8 @@ interface IFileManager {
     files?: Array<object>;
     handleFile?(file: object): void;
     handleFiles?(files: Array<object>): void;
-    ExtraContent?: JSX.Element;
-    ExtraContents?: Array<JSX.Element>;
+    ExtraContent?: FC;
+    ExtraContents?: Array<FC>;
     theme?: string;
     userId?: string;
     uploadText?: string;
@@ -18,9 +18,10 @@ interface IFileManager {
     maxFileSize?: number;
     needToSign?: boolean;
     enableRemove?: boolean;
-    enableDisable?: boolean;
+    enableModerate?: boolean;
     enableFakeRemove?: boolean;
     showFilename?: boolean;
+    showFileStatus?: boolean;
 }
 /**
  * Улучшенная версия загрузчика файлов.

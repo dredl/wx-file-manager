@@ -6,13 +6,13 @@ import {
   READ_GRAIN_RECEIPT_DATA,
   MODERATE_LINK_MUTATION
 } from "../queries"
-import { useMutation } from "react-apollo"
+import { useMutation } from "@apollo/client"
 import { client } from "../apollo-client"
 import { gatewayClient } from "../apollo-gateway"
 import filesize from "filesize"
 import { notifyServer } from "wx-notify"
 import accepts from "attr-accept"
-import UploaderContext from "./UnloaderContext"
+import UploaderContext from "./UploaderContext"
 const OBJ_TYPE_GRAIN_RECEIPTS = 101
 
 const reducer = (state, action) => {
