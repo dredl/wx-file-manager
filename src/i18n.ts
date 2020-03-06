@@ -1,6 +1,7 @@
 export const messages = {
   en: {
-    "chooseFile": "Choose File",
+    "uploadFiles": "Upload files",
+    "chooseFile": "Select files",
     "download": "View",
     "moderate": "Moderate",
     "sign": "Sign",
@@ -10,10 +11,26 @@ export const messages = {
     "IIN": "IIN",
     "Owner of EDS": "Owner of EDS",
     "Authority issuing EDS": "Authority issuing EDS",
-    "Valid thought": "Valid thought"
+    "Valid thought": "Valid thought",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "edsPassword": "EDS password",
+    "signModalHeader": "Signing file",
+    "signModalMessage1": `According to article 24 Of the law of the Republic of Kazakhstan dated 7.01.2003 № 370 "About electronic document and electronic digital signature", a signed Electronic document is equivalent to a paper document.`,
+    "signModalMessage2": "To sign an electronic document , select Your EDS (GOST or RSA)",
+    "signPushHedaer": "Еxecution of document",
+    "signPushMessage": "A document has been signed with a digital signature.",
+
+    "grStatus": "Grain Receipt status",
+    "fileStatus": "Document status",
+    "fileStatusInModeration": "Awaiting moderation",
+    "fileStatusRefused": "Rejected",
+    "fileStatusConfirmed": "Approved",
+    "dropHere": "Drop files here"
   },
   ru: {
-    "chooseFile": "Выберите файл",
+    "uploadFiles": "Загрузка файлов",
+    "chooseFile": "Выберите файлы",
     "download": "Просмотреть",
     "moderate": "Модерация",
     "sign": "Подписать",
@@ -24,10 +41,28 @@ export const messages = {
     "Owner of EDS": "Владелец ЭЦП",
     "Authority issuing EDS": "Орган, выдавший ЭЦП",
     "Valid thought": "Действителен до",
-    "Key algorithm": "Алгоритм ключа"
+    "Key algorithm": "Алгоритм ключа",
+
+    "cancel": "Отмена",
+    "confirm": "Подвердить",
+    "edsPassword": "Пароль ЭЦП",
+    "signModalHeader": "Подписание файла",
+    "signModalMessage1":
+      "Согласно статьи 24 Закона РК от 7.01.2003 № 370 «Об электронном документе и электронной цифровой подписи», подписанный Электронный документ равнозначен документу на бумажном носителе.",
+    "signModalMessage2": "Для подписание электронного документа, выберите Ваш ЭЦП (GOST или RSA)",
+    "signPushHedaer": "Подписание документа",
+    "signPushMessage": "Документ успешно подписан с помощью ЭЦП.",
+
+    "grStatus": "Статус зерновой расписки",
+    "fileStatus": "Статус документа:",
+    "fileStatusInModeration": "Ожидает модерации",
+    "fileStatusRefused": "Отклонен",
+    "fileStatusConfirmed": "Одобрен",
+    "dropHere": "Переместите файлы сюда"
   },
   kk: {
-    "chooseFile": "Файлды тандаңыз",
+    "uploadFiles": "Файлдарды жүктеу",
+    "chooseFile": "Файлдарды тандаңыз",
     "download": "Карау",
     "moderate": "Модерация",
     "sign": "Қол қою",
@@ -41,6 +76,21 @@ export const messages = {
     "Owner of EDS": "ЭЦҚ иесі",
     "Authority issuing EDS": "ЭЦҚ берілген мекеме",
     "Valid thought": "Жарамдылық мерзімі",
-    "Key algorithm": "Кілт алгоритмі"
+    "Key algorithm": "Кілт алгоритмі",
+    "cancel": "Болдырмау",
+    "confirm": "Растау",
+    "edsPassword": "ЭЦҚ құпиясөзі",
+    "signModalHeader": "",
+    "signModalMessage1": `Қазақстан Республикасының 2003 жылғы 7 қаңтардағы № 370 "Электрондық құжат және электрондық цифрлық қолтаңба туралы " Заңының 24- бабына сәйкес қол қойылған электрондық құжат қағаз нұсқадағы құжатқа тең.`,
+    "signModalMessage2": "Электрондық құжатқа қол қою үшін сіздің ЭЦҚ (GOST немесе RSA) таңдаңыз.",
+    "signPushHedaer": "Құжатқа қол қою",
+    "signPushMessage": "Құжатқа ЭЦҚ көмегімен сәтті қол қойылды.",
+
+    "grStatus": "Астық қолхаттың мәртебесі",
+    "fileStatus": "Құжаттың мәртебесі:",
+    "fileStatusInModeration": "Модерация күтілуде",
+    "fileStatusRefused": "Қабылданған жоқ",
+    "fileStatusConfirmed": "Қабылданды",
+    "dropHere": "Файлдарды осында орналастырыңыз"
   }
 }

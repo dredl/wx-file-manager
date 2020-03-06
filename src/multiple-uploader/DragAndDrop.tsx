@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from "react"
+import { messages } from "../i18n"
+const language = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "ru"
 export const DragAndDrop = props => {
   const [drag, setDrag] = useState(false)
   let dragCounter = 0 //, setDragCounter] = useState(0)
@@ -76,7 +78,7 @@ export const DragAndDrop = props => {
               height: "100%"
             }}
           >
-            <div>Переместите файл сюда</div>
+            <div>{messages[language].dropHere}</div>
           </div>
         </div>
       )}

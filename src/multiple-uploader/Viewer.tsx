@@ -39,19 +39,23 @@ const SignFileStatus = ({ metadata, showFileStatus }) => {
     }
     // отклонен
     if (status == 0) {
-      data = { icon: crossRed, className: "f-manager__block_status_error", label: "Отклонен" }
+      data = {
+        icon: crossRed,
+        className: "f-manager__block_status_error",
+        label: messages[language].fileStatusInModeration
+      }
     }
     //на модерации
     if (status == 1) {
-      data = { icon: clock, className: "", label: "Ожидает модерации" }
+      data = { icon: clock, className: "", label: messages[language].refused }
     }
     // проверен
     if (status == 2) {
-      data = { icon: galka, className: "", label: "Проверен" }
+      data = { icon: galka, className: "", label: messages[language].confirmed }
     }
     return (
       <>
-        <span className="f-manager__signs_label">Статус документа:</span>
+        <span className="f-manager__signs_label">{messages[language].documentStatus}</span>
         <div className="f-manager__block_status">
           <img src={data.icon} alt="" />
           <span className={data.className}>{data.label}</span>
@@ -67,7 +71,7 @@ const SignFileStatus = ({ metadata, showFileStatus }) => {
     return (
       <>
         <span className="f-manager__signs_label">
-          {objType == OBJ_TYPE_GRAIN_RECEIPTS ? "Статус зерновой расписки:" : "Подписи:"}
+          {objType == OBJ_TYPE_GRAIN_RECEIPTS ? messages[language].grStatus : messages[language].filStatus}
         </span>
         {signs.map((sign, key) => (
           <div className="f-manager__block_status" key={key}>
@@ -85,7 +89,7 @@ const SignFileStatus = ({ metadata, showFileStatus }) => {
     }
     return (
       <>
-        <span className="f-manager__signs_label">Статус зерновой расписки:</span>
+        <span className="f-manager__signs_label">{messages[language].grStatus}</span>
         {signs.map((sign, key) => (
           <div className="f-manager__block_status" key={key}>
             <img src={sign.signed ? galka : crossRed} alt="" />
@@ -195,7 +199,7 @@ const Viewer: React.FC<IViewer> = ({
         </div>
         {!isLoading && <SignFileStatus metadata={file.metadata} showFileStatus={showFileStatus} />}
       </div>
-      {needToSign && !signed && <SignFile fileId={file._id} handleSign={handleSign} />}
+      {needToSign && <SignFile fileId={file._id} handleSign={handleSign} signed={signed} />}
     </>
   )
 }

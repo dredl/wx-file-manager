@@ -5,6 +5,8 @@ import Viewer from "./Viewer"
 import { DragAndDrop } from "./DragAndDrop"
 import { useUpload } from "./useUpload"
 import "../index.scss"
+import { messages } from "../i18n"
+
 //todo придумать как сделать так чтобы был requred либо file либо files
 // Пока не вижу смысла устанавливать wx-constants изза одной константы
 // export const OBJ_TYPE_GRAIN_RECEIPTS = 101
@@ -36,6 +38,7 @@ interface IFileManager {
   showFileStatus?: boolean // Отображать ли статус файла. 0 - отклонен, 1 на модерации 2 проверен
 }
 
+const language = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18nextLng") : "ru"
 /**
  * Улучшенная версия загрузчика файлов.
  * @param props
@@ -51,7 +54,7 @@ export const FileManager: React.FC<IFileManager> = props => {
     ExtraContents = [],
     theme = "default",
     userId = null,
-    uploadText = "Загрузка файлов",
+    uploadText = messages[language].uploadFiles,
     extensions = "",
     objId = "",
     objType = 999,
@@ -107,7 +110,7 @@ export const FileManager: React.FC<IFileManager> = props => {
               <label htmlFor={`file-manager-${randId}`}>
                 <div className="mad-uploader-load">
                   <img src={addFile} alt="" />
-                  <span>Выберите файл</span>
+                  <span>{messages[language].chooseFile}</span>
                   {extensions != "*" && (
                     <span style={{ color: "#B3B3B3", marginLeft: "5px" }}>
                       ({extensions}, {filesize(maxFileSize)})

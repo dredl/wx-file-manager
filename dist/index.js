@@ -423,8 +423,8 @@ var SignFile = function (props) {
             React__default.createElement("label", { htmlFor: "EDS-sign-" + randInd, className: "jbtn jbtn-fuksiya" }, messages[language$1]["Select the file with EDS"])));
     };
     return (React__default.createElement(React__default.Fragment, null,
-        React__default.createElement("div", { className: "sign-button" },
-            React__default.createElement("button", { className: "jbtn jbtn-wide jbtn-green", onClick: function (e) { return toggle(e); } }, messages[language$1].sign)),
+        !props.signed && (React__default.createElement("div", { className: "sign-button" },
+            React__default.createElement("button", { className: "jbtn jbtn-wide jbtn-green", onClick: function (e) { return toggle(e); } }, messages[language$1].sign))),
         React__default.createElement(reactstrap.Modal, { isOpen: modal, className: "prompt", centered: true, toggle: toggle, backdrop: "static" },
             React__default.createElement(reactstrap.ModalHeader, null, "\u041F\u043E\u0434\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430"),
             (sLoading || loading) && React__default.createElement(StdLoader, { type: "modal", text: "\u041F\u043E\u0434\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0444\u0430\u0439\u043B\u0430, \u043F\u043E\u0434\u043E\u0436\u0434\u0438\u0442\u0435" }),
@@ -581,7 +581,7 @@ var Viewer = function (_a) {
                     !isLoading && enableRemove && React__default.createElement(Remove, { removeDoc: function (e) { return onRemove(e, file._id); } }),
                     isLoading && React__default.createElement(StdSpinner, null))),
             !isLoading && React__default.createElement(SignFileStatus, { metadata: file.metadata, showFileStatus: showFileStatus })),
-        needToSign && !signed && React__default.createElement(SignFile, { fileId: file._id, handleSign: handleSign })));
+        needToSign && React__default.createElement(SignFile, { fileId: file._id, handleSign: handleSign, signed: signed })));
 };
 
 var DragAndDrop = function (props) {

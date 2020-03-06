@@ -14,6 +14,7 @@ const language = localStorage.getItem("i18nextLng") ? localStorage.getItem("i18n
 interface ISignFile {
   fileId: string
   handleSign(file: object): void
+  signed: boolean
 }
 
 const SignFile: FC<ISignFile> = props => {
@@ -74,8 +75,8 @@ const SignFile: FC<ISignFile> = props => {
 
     if (file) {
       notify({
-        header: "Файл подписан",
-        description: "Файл успешно подписан!!!"
+        header: messages[language].signPushHedaer,
+        description: messages[language].signPushMessage
       })
       handleSignParent && handleSignParent(file.data.signDocument)
       setModal(false)
@@ -181,31 +182,33 @@ const SignFile: FC<ISignFile> = props => {
 
   return (
     <>
-      <div className="sign-button">
-        <button className="jbtn jbtn-wide jbtn-green" onClick={e => toggle(e)}>
-          {messages[language].sign}
-        </button>
-      </div>
+      {!props.signed && (
+        <div className="sign-button">
+          <button className="jbtn jbtn-wide jbtn-green" onClick={e => toggle(e)}>
+            {messages[language].sign}
+          </button>
+        </div>
+      )}
+
       <Modal isOpen={modal} className="prompt" centered={true} toggle={toggle} backdrop="static">
-        <ModalHeader>Подписание документа</ModalHeader>
-        {(sLoading || loading) && <StdLoader type="modal" text="Подписание файла, подождите" />}
+        <ModalHeader>{messages[language].signModalHeader}</ModalHeader>
+        {(sLoading || loading) && <StdLoader type="modal" />}
         <form className="mad-form" onSubmit={e => handleSign(e, props.fileId)}>
           <ModalBody>
             <p style={{ fontFamily: "dinpro-med", fontSize: "13px", lineHeight: "1.3" }}>
-              Согласно статьи 24 Закона РК от 7.01.2003 № 370 «Об электронном документе и электронной цифровой подписи»,
-              подписанный Электронный документ равнозначен документу на бумажном носителе.
+              {messages[language].signModalMessage1}
             </p>
             <p style={{ fontFamily: "dinpro-med", fontSize: "13px", lineHeight: "1.3" }}>
-              Для подписание эектронного документа, выберите Ваш ЭЦП (GOST или RSA)
+              {messages[language].signModalMessage2}
             </p>
             <RenderContent />
           </ModalBody>
           <ModalFooter>
             <button className="jbtn jbtn-low jbtn-cancel" onClick={e => toggle(e)}>
-              Отмена
+              {messages[language].cancel}
             </button>
             <button className="jbtn jbtn-low jbtn-green" type="submit" disabled={!EDSdata}>
-              Подписать
+              {messages[language].confirm}
             </button>
           </ModalFooter>
         </form>
@@ -217,7 +220,7 @@ const SignFile: FC<ISignFile> = props => {
 
           <ModalBody>
             <InputStyleOne
-              label="Пароль ЭЦП"
+              label={messages[language].edsPassword}
               name="password"
               value={password.value}
               enableTooltip={false}
@@ -228,10 +231,10 @@ const SignFile: FC<ISignFile> = props => {
           </ModalBody>
           <ModalFooter>
             <button className="jbtn jbtn-low jbtn-cancel" onClick={e => toggle2(e)}>
-              Отмена
+              {messages[language].cancel}
             </button>
             <button className="jbtn jbtn-low jbtn-green" type="submit" disabled={password.value == ""}>
-              Подвердить
+              {messages[language].confirm}
             </button>
           </ModalFooter>
         </form>
